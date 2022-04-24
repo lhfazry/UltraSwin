@@ -140,3 +140,4 @@ data/
 output/*
 *.pth
 lightning_logs/*
+.DS_Store
