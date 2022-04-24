@@ -4,11 +4,12 @@ from torchvision import transforms
 from datasets.EchoSet import EchoSet
 
 class EchoNetDataModule(pl.LightningDataModule):
-    def __init__(self, data_dir: str = "datasets/EchoNet", batch_size: int = 32):
+    def __init__(self, data_dir: str = "datasets/EchoNet", batch_size: int = 32, num_workers: int = 8):
         super().__init__()
 
         self.data_dir = data_dir
         self.batch_size = batch_size
+        self.num_workers = num_workers
 
         #self.transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
 
@@ -55,13 +56,13 @@ class EchoNetDataModule(pl.LightningDataModule):
                                 num_data=40)
 
     def train_dataloader(self):
-        return DataLoader(self.train_set, batch_size=self.batch_size, num_workers=8)
+        return DataLoader(self.train_set, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def val_dataloader(self):
-        return DataLoader(self.val_set, batch_size=self.batch_size, num_workers=8)
+        return DataLoader(self.val_set, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def test_dataloader(self):
-        return DataLoader(self.test_set, batch_size=self.batch_size, num_workers=8)
+        return DataLoader(self.test_set, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def predict_dataloader(self):
-        return DataLoader(self.predict_set, batch_size=self.batch_size, num_workers=8)
+        return DataLoader(self.predict_set, batch_size=self.batch_size, num_workers=self.num_workers)
