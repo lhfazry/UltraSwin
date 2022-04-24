@@ -38,7 +38,9 @@ if __name__ == '__main__':
 
     if mode == 'train':
         trainer.fit(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
-        trainer.test()
+
+    if mode == 'validate':
+        trainer.validate(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
 
     if mode == 'test':
         trainer.test(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
