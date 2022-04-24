@@ -1,6 +1,7 @@
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
+import torchmetrics
 
 from torch.nn import functional as F
 from backbones.swin_transformer import SwinTransformer3D
@@ -29,6 +30,9 @@ class UltraSwin(pl.LightningModule):
                  use_checkpoint=False):
         super().__init__()
         self.save_hyperparameters()
+
+        self.train_acc = torchmetrics.Accuracy()
+        self.valid_acc = torchmetrics.Accuracy()
 
         self.swin_transformer = SwinTransformer3D(
             pretrained=pretrained,
@@ -99,6 +103,9 @@ class UltraSwin(pl.LightningModule):
 
         loss = mse_loss(y_hat, ejection)
 
+        self.train_acc(y_hat, ejection)
+        self.log('train_acc', self.train_acc, on_step=True, on_epoch=False)
+
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -110,6 +117,10 @@ class UltraSwin(pl.LightningModule):
 
         y_hat = self(nvideo) 
         loss = mse_loss(y_hat, ejection)
+        
+        self.train_acc(y_hat, ejection)
+        self.log('valid_acc', self.train_acc, on_step=True, on_epoch=True)
+
         return loss
 
     def configure_optimizers(self):
