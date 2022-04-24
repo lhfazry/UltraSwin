@@ -36,7 +36,7 @@ class EchoNetDataModule(pl.LightningDataModule):
                                 random_clip=False,
                                 dataset_mode='repeat')
 
-        if stage == "val" or stage is None:
+        if stage == "validate" or stage is None:
             self.val_set   = EchoSet(root=self.data_dir,
                                 split="val",
                                 pad=8,
