@@ -52,10 +52,10 @@ class UltraSwin(pl.LightningModule):
         
         self.avgpool = nn.AdaptiveAvgPool1d(1)
         self.ejection = nn.Sequential(
-            nn.Linear(in_features=embed_dim, out_features=embed_dim//2, bias=True),
-            nn.LayerNorm(embed_dim//2),
+            nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
+            nn.LayerNorm(4*embed_dim),
             nn.LeakyReLU(negative_slope=0.05, inplace=True),
-            nn.Linear(in_features=embed_dim//2, out_features=1, bias=True),
+            nn.Linear(in_features=4*embed_dim, out_features=1, bias=True),
             Reduce(),
             nn.Sigmoid()
         )
@@ -66,9 +66,12 @@ class UltraSwin(pl.LightningModule):
 
         #print(f'2: {x.shape}')
         x = self.swin_transformer(x) # n c d h w ==> torch.Size([1, 768, 32, 4, 4])
-        x = x.flatten(-2) # n c d hxw
-        x = rearrange(x, 'n c d hw -> n d hw c')
-        x = self.avgpool(x).squeeze() # n d hw
+        x = x.mean(2) # n c h w
+        x = x.flatten(-2) # n c hxw
+        print(f'x: {x.shape}')
+        x = x.transpose(1, 2) # n hxw c
+        #x = rearrange(x, 'n c d hw -> n d hw c')
+        #x = self.avgpool(x).squeeze() # n d hw
 
         return x
 
