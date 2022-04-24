@@ -24,7 +24,7 @@ if __name__ == '__main__':
     batch_size = params.batch_size
     embed_dim = params.embed_dim
     frozen_stages = params.frozen_stages
-    ckpt_path = params.checkpoint_path
+    ckpt_path = params.ckpt_path
     max_epochs = params.max_epochs
     num_workers = params.num_workers
     accelerator = params.accelerator
