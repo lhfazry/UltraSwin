@@ -104,6 +104,3 @@ class UltraSwin(pl.LightningModule):
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=10e-5)
-
-    def on_epoch_end(self):
-        print('on_epoch_end')
