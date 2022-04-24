@@ -10,7 +10,7 @@ parser.add_argument("--data_dir", type=str, default="datasets/EchoNet", help="Pa
 parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
 parser.add_argument("--embed_dim", type=int, default=96, help="Embed dimension")
 parser.add_argument("--frozen_stages", type=int, default="3", help="Frozen stages")
-parser.add_argument("--checkpoint_path", type=str, default=None, help="Frozen stages")
+parser.add_argument("--ckpt_path", type=str, default=None, help="Checkpoint path")
 parser.add_argument("--max_epochs", type=int, default=100, help="Max epochs")
 parser.add_argument("--num_workers", type=int, default=8, help="num_workers")
 parser.add_argument("--accelerator", type=str, default='cpu', help="Accelerator")
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     batch_size = params.batch_size
     embed_dim = params.embed_dim
     frozen_stages = params.frozen_stages
-    checkpoint_path = params.checkpoint_path
+    ckpt_path = params.checkpoint_path
     max_epochs = params.max_epochs
     num_workers = params.num_workers
     accelerator = params.accelerator
@@ -37,8 +37,8 @@ if __name__ == '__main__':
             num_sanity_val_steps=1, auto_scale_batch_size=True)
 
     if mode == 'train':
-        trainer.fit(model=ultra_swin, datamodule=data_module, ckpt_path=checkpoint_path)
+        trainer.fit(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
         trainer.test()
 
     if mode == 'test':
-        trainer.test(model=ultra_swin, datamodule=data_module, ckpt_path=checkpoint_path)
+        trainer.test(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
