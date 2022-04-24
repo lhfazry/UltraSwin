@@ -6,6 +6,7 @@ from torch.nn import functional as F
 from backbones.swin_transformer import SwinTransformer3D
 from einops import rearrange
 from utils.tensor_utils import Reduce
+from losses.mse import mse_loss
 
 class UltraSwin(pl.LightningModule):
     def __init__(self,
@@ -60,6 +61,8 @@ class UltraSwin(pl.LightningModule):
             nn.Sigmoid()
         )
 
+
+
     def forward_features(self, x):
         #print(f'1: {x.shape}')
         x = rearrange(x, 'n d c h w -> n c d h w')
@@ -94,7 +97,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection: {ejection.data}')
         #print(f'y_hat: {y_hat.data}')
 
-        loss = nn.MSELoss(y_hat, ejection)
+        loss = mse_loss(y_hat, ejection)
 
         return loss
 
@@ -106,7 +109,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo) 
-        loss = nn.MSELoss(y_hat, ejection)
+        loss = mse_loss(y_hat, ejection)
         return loss
 
     def configure_optimizers(self):
