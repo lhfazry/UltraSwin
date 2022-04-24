@@ -34,5 +34,5 @@ if __name__ == '__main__':
         frozen_stages=frozen_stages)
 
     if mode == 'train':
-        trainer = pl.Trainer(accelerator=accelerator, max_epochs=max_epochs)
+        trainer = pl.Trainer(accelerator=accelerator, max_epochs=max_epochs, num_sanity_val_steps=1)
         trainer.fit(model=ultra_swin, datamodule=data_module, ckpt_path=checkpoint_path)
