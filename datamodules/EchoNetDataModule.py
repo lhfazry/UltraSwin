@@ -36,6 +36,13 @@ class EchoNetDataModule(pl.LightningDataModule):
                                 random_clip=False,
                                 dataset_mode='repeat')
 
+        if stage == "val" or stage is None:
+            self.val_set   = EchoSet(root=self.data_dir,
+                                split="val",
+                                pad=8,
+                                random_clip=False,
+                                dataset_mode='repeat')
+
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
             self.test_set   = EchoSet(root=self.data_dir,
