@@ -71,8 +71,8 @@ class EchoSet(torch.utils.data.Dataset):
                 
                 total += 1
 
-                if total >= self.num_data and self.num_data is not None:
-                    break
+                #if total >= self.num_data and self.num_data is not None:
+                #    break
                     
 
         self.frames = collections.defaultdict(list)
