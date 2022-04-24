@@ -28,15 +28,13 @@ class EchoNetDataModule(pl.LightningDataModule):
                                 split="train",
                                 pad=8,
                                 random_clip=False,
-                                dataset_mode='repeat',
-                                num_data=200)
+                                dataset_mode='repeat')
             
             self.val_set   = EchoSet(root=self.data_dir,
                                 split="val",
                                 pad=8,
                                 random_clip=False,
-                                dataset_mode='repeat',
-                                num_data=40)
+                                dataset_mode='repeat')
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
@@ -44,16 +42,14 @@ class EchoNetDataModule(pl.LightningDataModule):
                                 split="test",
                                 pad=8,
                                 random_clip=False,
-                                dataset_mode='repeat',
-                                num_data=40)
+                                dataset_mode='repeat')
 
         if stage == "predict" or stage is None:
             self.predict_set   = EchoSet(root=self.data_dir,
                                 split="test",
                                 pad=8,
                                 random_clip=False,
-                                dataset_mode='repeat',
-                                num_data=40)
+                                dataset_mode='repeat')
 
     def train_dataloader(self):
         return DataLoader(self.train_set, batch_size=self.batch_size, num_workers=self.num_workers)
