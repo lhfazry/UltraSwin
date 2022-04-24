@@ -33,7 +33,12 @@ if __name__ == '__main__':
     ultra_swin = UltraSwin(pretrained, embed_dim=embed_dim, depths=[2, 2, 18, 2], 
         frozen_stages=frozen_stages)
 
-    if mode == 'train':
-        trainer = pl.Trainer(accelerator=accelerator, max_epochs=max_epochs, 
+    trainer = pl.Trainer(accelerator=accelerator, max_epochs=max_epochs, 
             num_sanity_val_steps=1, auto_scale_batch_size=True)
+
+    if mode == 'train':
         trainer.fit(model=ultra_swin, datamodule=data_module, ckpt_path=checkpoint_path)
+        trainer.test()
+
+    if mode == 'test':
+        trainer.test(model=ultra_swin, datamodule=data_module, ckpt_path=checkpoint_path)
