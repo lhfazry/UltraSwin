@@ -2,6 +2,7 @@ import argparse
 import pytorch_lightning as pl
 from models.ultra_swin import UltraSwin
 from datamodules.EchoNetDataModule import EchoNetDataModule
+from pytorch_lightning.loggers import TensorBoardLogger
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--mode", type=str, default="train", help="Train or test")
@@ -14,6 +15,8 @@ parser.add_argument("--ckpt_path", type=str, default=None, help="Checkpoint path
 parser.add_argument("--max_epochs", type=int, default=100, help="Max epochs")
 parser.add_argument("--num_workers", type=int, default=8, help="num_workers")
 parser.add_argument("--accelerator", type=str, default='cpu', help="Accelerator")
+parser.add_argument("--dataset_mode", type=str, default='repeat', help="Dataset Mode")
+parser.add_argument("--logs_dir", type=str, default='lightning_logs', help="Log dir")
 
 params = parser.parse_args()
 
@@ -28,13 +31,18 @@ if __name__ == '__main__':
     max_epochs = params.max_epochs
     num_workers = params.num_workers
     accelerator = params.accelerator
+    dataset_mode = params.dataset_mode
+    logs_dir = params.logs_dir
 
-    data_module = EchoNetDataModule(data_dir=data_dir, batch_size=batch_size, num_workers=num_workers)
+    logger = TensorBoardLogger(save_dir=logs_dir, name="ultrasound")
+
+    data_module = EchoNetDataModule(data_dir=data_dir, batch_size=batch_size, 
+        num_workers=num_workers, dataset_mode=dataset_mode)
     ultra_swin = UltraSwin(pretrained, embed_dim=embed_dim, depths=[2, 2, 18, 2], 
-        frozen_stages=frozen_stages)
+        frozen_stages=frozen_stages, batch_size=batch_size)
 
     trainer = pl.Trainer(accelerator=accelerator, max_epochs=max_epochs, 
-            num_sanity_val_steps=1, auto_scale_batch_size=True)
+            num_sanity_val_steps=1, auto_scale_batch_size=True, logger=logger)
 
     if mode == 'train':
         trainer.fit(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)

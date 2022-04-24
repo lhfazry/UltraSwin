@@ -27,12 +27,18 @@ class UltraSwin(pl.LightningModule):
                  norm_layer=nn.LayerNorm,
                  patch_norm=False,
                  frozen_stages=-1,
-                 use_checkpoint=False):
+                 use_checkpoint=False, 
+                 batch_size=8):
         super().__init__()
         self.save_hyperparameters()
+        self.batch_size = batch_size
 
-        self.train_acc = torchmetrics.Accuracy()
-        self.valid_acc = torchmetrics.Accuracy()
+        self.train_mse = torchmetrics.MeanSquaredError()
+        self.train_mae = torchmetrics.MeanAbsoluteError()
+        #self.train_r2 = torchmetrics.R2Score()
+        self.val_mse = torchmetrics.MeanSquaredError()
+        self.val_mae = torchmetrics.MeanAbsoluteError()
+        #self.val_r2 = torchmetrics.R2Score()
 
         self.swin_transformer = SwinTransformer3D(
             pretrained=pretrained,
@@ -103,8 +109,14 @@ class UltraSwin(pl.LightningModule):
 
         loss = mse_loss(y_hat, ejection)
 
-        self.train_acc(y_hat, ejection)
-        self.log('train_acc', self.train_acc, on_step=True, on_epoch=False)
+        self.train_mse(y_hat, ejection)
+        self.train_mae(y_hat, ejection)
+        #self.train_r2(y_hat, ejection)
+
+        self.log('train_loss', loss, batch_size=self.batch_size)
+        self.log('train_mse', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
+        self.log('train_mae', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
+        #self.log('train_r2', self.train_r2, on_step=True, on_epoch=False, batch_size=self.batch_size)
 
         return loss
 
@@ -118,8 +130,14 @@ class UltraSwin(pl.LightningModule):
         y_hat = self(nvideo) 
         loss = mse_loss(y_hat, ejection)
         
-        self.train_acc(y_hat, ejection)
-        self.log('valid_acc', self.train_acc, on_step=True, on_epoch=True)
+        self.val_mse(y_hat, ejection)
+        self.val_mae(y_hat, ejection)
+        #self.val_r2(y_hat, ejection)
+
+        self.log('val_loss', loss, batch_size=self.batch_size)
+        self.log('val_mse', self.val_mse, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('val_mae', self.val_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        #self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
         return loss
 
