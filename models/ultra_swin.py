@@ -68,7 +68,7 @@ class UltraSwin(pl.LightningModule):
         x = self.swin_transformer(x) # n c d h w ==> torch.Size([1, 768, 32, 4, 4])
         x = x.mean(2) # n c h w
         x = x.flatten(-2) # n c hxw
-        print(f'x: {x.shape}')
+        #print(f'x: {x.shape}')
         x = x.transpose(1, 2) # n hxw c
         #x = rearrange(x, 'n c d hw -> n d hw c')
         #x = self.avgpool(x).squeeze() # n d hw
@@ -90,7 +90,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo) 
-        loss = F.mse_loss(y_hat, ejection)
+        loss = F.mse_loss(y_hat, ejection, reduction=None)
 
         return loss
 
@@ -102,7 +102,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo) 
-        loss = F.mse_loss(y_hat, ejection)
+        loss = F.mse_loss(y_hat, ejection, reduction=None)
         return loss
 
     def configure_optimizers(self):
