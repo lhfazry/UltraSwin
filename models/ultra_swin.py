@@ -90,7 +90,11 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo) 
-        loss = F.mse_loss(y_hat, ejection)
+
+        #print(f'ejection: {ejection.data}')
+        #print(f'y_hat: {y_hat.data}')
+
+        loss = nn.MSELoss(y_hat, ejection)
 
         return loss
 
@@ -102,7 +106,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo) 
-        loss = F.mse_loss(y_hat, ejection)
+        loss = nn.MSELoss(y_hat, ejection)
         return loss
 
     def configure_optimizers(self):
