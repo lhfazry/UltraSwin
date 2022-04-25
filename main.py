@@ -34,7 +34,7 @@ if __name__ == '__main__':
     dataset_mode = params.dataset_mode
     logs_dir = params.logs_dir
 
-    logger = TensorBoardLogger(save_dir=logs_dir, name="ultrasound")
+    logger = TensorBoardLogger(save_dir=logs_dir, name="ultraswin")
 
     data_module = EchoNetDataModule(data_dir=data_dir, batch_size=batch_size, 
         num_workers=num_workers, dataset_mode=dataset_mode)
