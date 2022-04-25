@@ -165,7 +165,7 @@ class UltraSwin(pl.LightningModule):
 
         return loss
 
-    def predict_step(self, batch, batch_idx, dataloader_idx):
+    def predict_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
         ejection = ejection.type(torch.float32) / 100.
 
