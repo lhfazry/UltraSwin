@@ -3,6 +3,7 @@ import pytorch_lightning as pl
 from models.ultra_swin import UltraSwin
 from datamodules.EchoNetDataModule import EchoNetDataModule
 from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--mode", type=str, default="train", help="Train or test")
@@ -42,7 +43,8 @@ if __name__ == '__main__':
         frozen_stages=frozen_stages, batch_size=batch_size)
 
     trainer = pl.Trainer(accelerator=accelerator, max_epochs=max_epochs, 
-            num_sanity_val_steps=1, auto_scale_batch_size=True, logger=logger)
+            num_sanity_val_steps=1, auto_scale_batch_size=True, logger=logger,
+            callbacks=[EarlyStopping(monitor="val_loss", mode="min")])
 
     if mode == 'train':
         trainer.fit(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
