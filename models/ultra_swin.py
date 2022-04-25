@@ -38,6 +38,9 @@ class UltraSwin(pl.LightningModule):
         #self.train_r2 = torchmetrics.R2Score()
         self.val_mse = torchmetrics.MeanSquaredError()
         self.val_mae = torchmetrics.MeanAbsoluteError()
+
+        self.test_mse = torchmetrics.MeanSquaredError()
+        self.test_mae = torchmetrics.MeanAbsoluteError()
         #self.val_r2 = torchmetrics.R2Score()
 
         self.swin_transformer = SwinTransformer3D(
@@ -140,6 +143,38 @@ class UltraSwin(pl.LightningModule):
         #self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
         return loss
+
+    def test_step(self, batch, batch_idx):
+        filename, nvideo, nlabel, ejection, repeat, fps = batch
+        ejection = (ejection / 100).type(torch.float32)
+        #print(f'nvideo.shape: {nvideo.shape}')
+        #print(f'ejection: {ejection}')
+        #print(f'nvideo.shape: f{nvideo.shape}')
+
+        y_hat = self(nvideo) 
+        loss = mse_loss(y_hat, ejection)
+        
+        self.test_mse(y_hat, ejection)
+        self.test_mae(y_hat, ejection)
+        #self.val_r2(y_hat, ejection)
+
+        self.log('test_loss', loss * 100., batch_size=self.batch_size)
+        self.log('test_mse', self.test_mse * 100., on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_mae', self.test_mae * 100., on_step=True, on_epoch=True, batch_size=self.batch_size)
+        #self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
+
+        return loss
+
+    def predict_step(self, batch, batch_idx, dataloader_idx):
+        filename, nvideo, nlabel, ejection, repeat, fps = batch
+        ejection = (ejection / 100).type(torch.float32)
+        #print(f'nvideo.shape: {nvideo.shape}')
+        #print(f'ejection: {ejection}')
+        #print(f'nvideo.shape: f{nvideo.shape}')
+
+        y_hat = self(nvideo) 
+
+        return y_hat * 100.
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=10e-5)

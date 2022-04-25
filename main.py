@@ -54,4 +54,5 @@ if __name__ == '__main__':
         trainer.test(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
 
     if mode == 'predict':
-        trainer.predict(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
+        predicts = trainer.predict(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
+        print(predicts)
