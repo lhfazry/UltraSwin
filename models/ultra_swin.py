@@ -100,7 +100,7 @@ class UltraSwin(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
 
-        ejection = ejection.type(torch.float32)# / 100.
+        ejection = ejection.type(torch.float32) / 100.
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
@@ -125,7 +125,7 @@ class UltraSwin(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
-        ejection = ejection.type(torch.float32) # / 100.
+        ejection = ejection.type(torch.float32) / 100.
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
@@ -146,7 +146,7 @@ class UltraSwin(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
-        ejection = ejection.type(torch.float32) # / 100.
+        ejection = ejection.type(torch.float32) / 100.
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
@@ -167,7 +167,7 @@ class UltraSwin(pl.LightningModule):
 
     def predict_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
-        ejection = ejection.type(torch.float32) # / 100.
+        ejection = ejection.type(torch.float32) / 100.
 
         y_hat = self(nvideo) 
 
