@@ -71,7 +71,7 @@ class UltraSwin(pl.LightningModule):
             nn.LeakyReLU(negative_slope=0.05, inplace=True),
             nn.Linear(in_features=4*embed_dim, out_features=1, bias=True),
             Reduce(),
-            nn.Sigmoid()
+            #nn.Sigmoid()
         )
 
 
@@ -100,7 +100,7 @@ class UltraSwin(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
 
-        ejection = ejection.type(torch.float32) / 100.
+        ejection = ejection.type(torch.float32)# / 100.
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
@@ -111,7 +111,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'y_hat: {y_hat.data}')
 
         loss = mse_loss(y_hat, ejection)
-
+        
         self.train_mse(y_hat, ejection)
         self.train_mae(y_hat, ejection)
         #self.train_r2(y_hat, ejection)
@@ -125,14 +125,14 @@ class UltraSwin(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
-        ejection = ejection.type(torch.float32) / 100.
+        ejection = ejection.type(torch.float32) # / 100.
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo) 
         loss = mse_loss(y_hat, ejection)
-        
+
         self.val_mse(y_hat, ejection)
         self.val_mae(y_hat, ejection)
         #self.val_r2(y_hat, ejection)
@@ -146,7 +146,7 @@ class UltraSwin(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
-        ejection = ejection.type(torch.float32) / 100.
+        ejection = ejection.type(torch.float32) # / 100.
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
@@ -167,12 +167,12 @@ class UltraSwin(pl.LightningModule):
 
     def predict_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
-        ejection = ejection.type(torch.float32) / 100.
+        ejection = ejection.type(torch.float32) # / 100.
 
         y_hat = self(nvideo) 
 
-        loss = mse_loss(y_hat, ejection)
-        return {'filename': filename, 'EF': ejection * 100., 'Pred': y_hat * 100., 'loss': loss * 100.}
+        loss = nn.MSELoss(reduction='none')(y_hat, ejection)
+        return {'filename': filename, 'EF': ejection, 'Pred': y_hat, 'loss': loss}
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=10e-5)
