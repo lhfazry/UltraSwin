@@ -158,9 +158,9 @@ class UltraSwin(pl.LightningModule):
         self.test_mae(y_hat, ejection)
         #self.val_r2(y_hat, ejection)
 
-        self.log('test_loss', loss * 100., batch_size=self.batch_size)
-        self.log('test_mse', self.test_mse * 100., on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_mae', self.test_mae * 100., on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_loss', loss, batch_size=self.batch_size)
+        self.log('test_mse', self.test_mse, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
         #self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
         return loss
