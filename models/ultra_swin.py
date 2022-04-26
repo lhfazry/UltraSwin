@@ -144,6 +144,19 @@ class UltraSwin(pl.LightningModule):
 
         return loss
 
+    def training_epoch_end(self, outputs):
+        avg_loss = torch.stack([x['loss'] for x in outputs]).mean()
+
+        logs = {'loss': avg_loss}
+        return {'avg_loss': avg_loss, 'log': logs, 'progress_bar': logs}
+
+    def validation_epoch_end(self, outputs):
+        # OPTIONAL
+        avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
+
+        logs = {'val_loss': avg_loss}
+        return {'avg_val_loss': avg_loss, 'log': logs, 'progress_bar': logs}
+
     def test_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
         ejection = ejection.type(torch.float32) / 100.
@@ -175,4 +188,7 @@ class UltraSwin(pl.LightningModule):
         return {'filename': filename, 'EF': ejection * 100., 'Pred': y_hat * 100., 'loss': loss * 100.}
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=10e-5)
+        optimizer = torch.optim.Adam(self.parameters(), lr=10e-3)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1)
+
+        return [optimizer], [lr_scheduler]
