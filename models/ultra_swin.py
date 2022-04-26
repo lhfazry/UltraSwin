@@ -102,7 +102,7 @@ class UltraSwin(pl.LightningModule):
     def forward(self, x):
         x = self.forward_features(x)
         x = self.forward_head(x)
-        print(x.shape)
+        #print(x.shape)
         return x
 
     def training_step(self, batch, batch_idx):
