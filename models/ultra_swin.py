@@ -76,7 +76,8 @@ class UltraSwin(pl.LightningModule):
 
         self.dropout = nn.Dropout(p=0.5)
         self.avg_pool = nn.AdaptiveAvgPool3d((1, 1, 1))
-        self.ef_regressor = nn.Linear(8*embed_dim, 1)
+        self.ef_regressor = nn.Linear(in_features=8*embed_dim, out_features=1, bias=True)
+        self.reduce = Reduce()
 
     def forward_features(self, x):
         #print(f'1: {x.shape}')
@@ -94,13 +95,14 @@ class UltraSwin(pl.LightningModule):
         x = self.dropout(x)
         x = x.view(x.shape[0], -1)
         x = self.ef_regressor(x)
+        x = self.reduce(x)
 
         return x
 
     def forward(self, x):
         x = self.forward_features(x)
         x = self.forward_head(x)
-
+        print(x.shape)
         return x
 
     def training_step(self, batch, batch_idx):

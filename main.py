@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     trainer = pl.Trainer(accelerator=accelerator, 
                 max_epochs=max_epochs, 
-                num_sanity_val_steps=0, 
+                num_sanity_val_steps=1, 
                 auto_scale_batch_size=True, 
                 enable_model_summary=True,
                 logger=logger,
