@@ -74,26 +74,32 @@ class UltraSwin(pl.LightningModule):
             nn.Sigmoid()
         )
 
-
+        self.dropout = nn.Dropout(p=0.5)
+        self.avg_pool = nn.AdaptiveAvgPool3d((1, 1, 1))
+        self.ef_regressor = nn.Linear(8*embed_dim, 1)
 
     def forward_features(self, x):
         #print(f'1: {x.shape}')
         x = rearrange(x, 'n d c h w -> n c d h w')
 
-        #print(f'2: {x.shape}')
         x = self.swin_transformer(x) # n c d h w ==> torch.Size([1, 768, 32, 4, 4])
-        x = x.mean(2) # n c h w
-        x = x.flatten(-2) # n c hxw
+        #x = x.mean(2) # n c h w
+        #x = x.flatten(-2) # n c hxw
         #print(f'x: {x.shape}')
-        x = x.transpose(1, 2) # n hxw c
-        #x = rearrange(x, 'n c d hw -> n d hw c')
-        #x = self.avgpool(x).squeeze() # n d hw
+        #x = x.transpose(1, 2) # n hxw c
+
+        return x
+    def forward_head(self, x):
+        x = self.avg_pool(x)
+        x = self.dropout(x)
+        x = x.view(x.shape[0], -1)
+        x = self.ef_regressor(x)
 
         return x
 
     def forward(self, x):
         x = self.forward_features(x)
-        x = self.ejection(x)
+        x = self.forward_head(x)
 
         return x
 
