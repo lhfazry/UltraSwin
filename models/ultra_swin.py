@@ -74,6 +74,14 @@ class UltraSwin(pl.LightningModule):
             nn.Sigmoid()
         )
 
+        self.ejection2 = nn.Sequential(
+            nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
+            nn.LayerNorm(4*embed_dim),
+            nn.LeakyReLU(negative_slope=0.05, inplace=True),
+            nn.Linear(in_features=4*embed_dim, out_features=1, bias=True),
+            Reduce()
+        )
+
         self.dropout = nn.Dropout(p=0.5)
         self.avg_pool = nn.AdaptiveAvgPool3d((1, 1, 1))
         self.ef_regressor = nn.Linear(in_features=8*embed_dim, out_features=1, bias=True)
@@ -94,8 +102,7 @@ class UltraSwin(pl.LightningModule):
         x = self.avg_pool(x)
         x = self.dropout(x)
         x = x.view(x.shape[0], -1)
-        x = self.ef_regressor(x)
-        x = self.reduce(x)
+        x = self.ejection2(x)
 
         return x
 
