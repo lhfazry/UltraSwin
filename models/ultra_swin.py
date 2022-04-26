@@ -159,7 +159,14 @@ class UltraSwin(pl.LightningModule):
         #self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
         tensorboard_logs = {'loss':{'val': loss } }
-        return {"loss": loss, 'log': tensorboard_logs }
+        return {"val_loss": loss, 'log': tensorboard_logs }
+
+    def validation_epoch_end(self, outputs):
+        val_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
+
+        log = {"avg_val_loss": val_loss}
+        self.log("avg_val_loss", val_loss)
+        return {"log": log, "val_loss": val_loss}
 
     def test_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
