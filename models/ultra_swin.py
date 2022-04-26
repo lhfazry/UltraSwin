@@ -120,8 +120,9 @@ class UltraSwin(pl.LightningModule):
         self.log('train_mse', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
         self.log('train_mae', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
         #self.log('train_r2', self.train_r2, on_step=True, on_epoch=False, batch_size=self.batch_size)
-
-        return loss
+        
+        tensorboard_logs = {'loss':{'train': loss } }
+        return {"loss": loss, 'log': tensorboard_logs }
 
     def validation_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
@@ -142,20 +143,8 @@ class UltraSwin(pl.LightningModule):
         self.log('val_mae', self.val_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
         #self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
-        return loss
-
-    def training_epoch_end(self, outputs):
-        avg_loss = torch.stack([x['loss'] for x in outputs]).mean()
-
-        logs = {'loss': avg_loss}
-        return {'avg_loss': avg_loss, 'log': logs, 'progress_bar': logs}
-
-    def validation_epoch_end(self, outputs):
-        # OPTIONAL
-        avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
-
-        logs = {'val_loss': avg_loss}
-        return {'avg_val_loss': avg_loss, 'log': logs, 'progress_bar': logs}
+        tensorboard_logs = {'loss':{'val': loss } }
+        return {"loss": loss, 'log': tensorboard_logs }
 
     def test_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
