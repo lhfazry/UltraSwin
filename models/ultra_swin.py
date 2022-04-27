@@ -75,10 +75,15 @@ class UltraSwin(pl.LightningModule):
         )
 
         self.ejection2 = nn.Sequential(
+            nn.LayerNorm(8*embed_dim),
             nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
+            nn.Dropout(p=0.5),
+            #nn.LeakyReLU(negative_slope=0.05, inplace=True),
+            
             nn.LayerNorm(4*embed_dim),
-            nn.LeakyReLU(negative_slope=0.05, inplace=True),
-            nn.Linear(in_features=4*embed_dim, out_features=1, bias=True),
+            nn.Linear(in_features=4*embed_dim, out_features=16, bias=True),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=16, out_features=1, bias=True),
             Reduce()
         )
 
