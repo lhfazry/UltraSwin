@@ -116,13 +116,13 @@ class EchoSet(torch.utils.data.Dataset):
         self.ejection = [f for (f, k) in zip(self.ejection, keep) if k]
         self.fps = [f for (f, k) in zip(self.fps, keep) if k]
 
-        self.vid_augs = va.Sequential([
-            va.RandomCrop(size=(240, 180)), # randomly crop video with a size of (240 x 180)
-            va.RandomRotate(degrees=10), # randomly rotates the video with a degree randomly choosen from [-10, 10]  
-            va.HorizontalFlip(), # horizontally flip the video with 50% probability
-            va.VerticalFlip(),
-            va.GaussianBlur(random.random())
-        ])
+        #self.vid_augs = va.Sequential([
+        #    va.RandomCrop(size=(240, 180)), # randomly crop video with a size of (240 x 180)
+        #    va.RandomRotate(degrees=10), # randomly rotates the video with a degree randomly choosen from [-10, 10]  
+        #    va.HorizontalFlip(), # horizontally flip the video with 50% probability
+        #    va.VerticalFlip(),
+        #    va.GaussianBlur(random.random())
+        #])
             
     def __getitem__(self, index):
         if self.mode == 'repeat':
@@ -318,7 +318,7 @@ class EchoSet(torch.utils.data.Dataset):
             if video.shape[0] != 128 or label.shape[0] != 128:
                 raise ValueError('WTF??', self.fixed_length, window_width, video.shape[0], label.shape[0])
             
-            video = self.vid_augs(video)
+            #video = self.vid_augs(video)
             
             return filename, video, label, ejection, repeat, fps
         
