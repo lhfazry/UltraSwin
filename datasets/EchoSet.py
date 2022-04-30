@@ -7,7 +7,7 @@ import torch
 
 import torch.utils.data
 import cv2  # pytype: disable=attribute-error
-from vidaug import augmentors as va
+#from vidaug import augmentors as va
 import random
 
 class EchoSet(torch.utils.data.Dataset):
