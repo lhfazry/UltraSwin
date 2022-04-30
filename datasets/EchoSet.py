@@ -14,6 +14,7 @@ class EchoSet(torch.utils.data.Dataset):
     def __init__(self, 
                  root,
                  split="train",
+                 augmented=False,
                  min_spacing=16,
                  max_length=128,
                  fixed_length=128,
@@ -28,6 +29,7 @@ class EchoSet(torch.utils.data.Dataset):
         self.max_length   = max_length
         self.min_length   = min_spacing
         self.fixed_length = fixed_length
+        self.augmented    = augmented
         self.padding      = pad
         self.mode         = dataset_mode # repeat, sample, full
         self.random_clip  = random_clip
@@ -195,7 +197,8 @@ class EchoSet(torch.utils.data.Dataset):
                 nvideo = np.pad(nvideo, ((0,0),(0,0),(p,p),(p,p)), mode='constant', constant_values=0)
             
             #print(f'before video size: {nvideo.shape}')
-            nvideo = np.asarray(self.vid_augs(nvideo))
+            if self.augmented:
+                nvideo = np.asarray(self.vid_augs(nvideo))
             #print(f'after video size: {np.asarray(nvideo).shape}')
             return filename, nvideo, nlabel, ejection, repeat, self.fps[index]
         
@@ -229,7 +232,8 @@ class EchoSet(torch.utils.data.Dataset):
             repeat      = 0
             fps         = self.fps[index]
             
-            video = np.asarray(self.vid_augs(video))
+            if self.augmented:
+                video = np.asarray(self.vid_augs(video))
 
             return filename, video, label, ejection, repeat, fps
         
@@ -322,7 +326,8 @@ class EchoSet(torch.utils.data.Dataset):
             if video.shape[0] != 128 or label.shape[0] != 128:
                 raise ValueError('WTF??', self.fixed_length, window_width, video.shape[0], label.shape[0])
             
-            video = np.asarray(self.vid_augs(video))
+            if self.augmented:
+                video = np.asarray(self.vid_augs(video))
             
             return filename, video, label, ejection, repeat, fps
         
