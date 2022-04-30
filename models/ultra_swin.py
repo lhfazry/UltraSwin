@@ -135,14 +135,14 @@ class UltraSwin(pl.LightningModule):
 
         loss = mse_loss(y_hat, ejection)
         
-        self.train_mse(y_hat, ejection)
-        self.train_mae(y_hat, ejection)
-        r2loss = r2_loss(y_hat, ejection)
+        #self.train_mse(y_hat, ejection)
+        #self.train_mae(y_hat, ejection)
+        #r2loss = r2_loss(y_hat, ejection)
 
-        self.log('train_loss', loss, batch_size=self.batch_size)
-        self.log('train_mse', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
-        self.log('train_mae', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
-        self.log('train_r2', r2loss, on_step=True, on_epoch=False, batch_size=self.batch_size)
+        #self.log('train_loss', loss, batch_size=self.batch_size)
+        #self.log('train_mse', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
+        #self.log('train_mae', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
+        #self.log('train_r2', r2loss, on_step=True, on_epoch=False, batch_size=self.batch_size)
         
         tensorboard_logs = {'loss':{'train': loss.detach() } }
         return {"loss": loss, 'log': tensorboard_logs }
