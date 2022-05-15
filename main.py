@@ -53,8 +53,8 @@ if __name__ == '__main__':
                 num_sanity_val_steps=1, 
                 auto_scale_batch_size=True, 
                 enable_model_summary=True,
-                logger=logger)
-    #           callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=10)]
+                logger=logger,
+                callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=10)])
 
     if mode == 'train':
         trainer.fit(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
