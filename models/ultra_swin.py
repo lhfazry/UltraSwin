@@ -40,11 +40,11 @@ class UltraSwin(pl.LightningModule):
         #self.train_mae = torchmetrics.MeanAbsoluteError()
         #self.train_r2 = torchmetrics.R2Score()
 
-        self.val_rmse = RMSE()
+        self.val_rmse = torchmetrics.MeanSquaredError(squared=False)
         self.val_mae = torchmetrics.MeanAbsoluteError()
         self.val_r2 = torchmetrics.R2Score()
 
-        self.test_rmse = RMSE
+        self.test_rmse = torchmetrics.MeanSquaredError(squared=False)
         self.test_mae = torchmetrics.MeanAbsoluteError()
         self.test_r2 = torchmetrics.R2Score()
 
