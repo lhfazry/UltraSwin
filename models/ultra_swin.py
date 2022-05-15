@@ -9,6 +9,8 @@ from einops import rearrange
 from utils.tensor_utils import Reduce
 from losses.mse import mse_loss
 from losses.r2 import r2_loss
+from sklearn.metrics import r2_score
+from losses.rmse import RMSE
 
 class UltraSwin(pl.LightningModule):
     def __init__(self,
@@ -34,17 +36,17 @@ class UltraSwin(pl.LightningModule):
         self.save_hyperparameters()
         self.batch_size = batch_size
 
-        self.train_mse = torchmetrics.MeanSquaredError()
-        self.train_mae = torchmetrics.MeanAbsoluteError()
+        #self.train_rmse = RMSE()
+        #self.train_mae = torchmetrics.MeanAbsoluteError()
         #self.train_r2 = torchmetrics.R2Score()
 
-        self.val_mse = torchmetrics.MeanSquaredError()
+        self.val_rmse = RMSE()
         self.val_mae = torchmetrics.MeanAbsoluteError()
-        #self.val_r2 = torchmetrics.R2Score()
+        self.val_r2 = torchmetrics.R2Score()
 
-        self.test_mse = torchmetrics.MeanSquaredError()
+        self.test_rmse = RMSE
         self.test_mae = torchmetrics.MeanAbsoluteError()
-        #self.test_r2 = torchmetrics.R2Score()
+        self.test_r2 = torchmetrics.R2Score()
 
         self.swin_transformer = SwinTransformer3D(
             pretrained=pretrained,
@@ -81,11 +83,11 @@ class UltraSwin(pl.LightningModule):
             nn.LayerNorm(8*embed_dim),
             nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
             nn.Dropout(p=0.5),
-            #nn.LeakyReLU(negative_slope=0.05, inplace=True),
             
             nn.LayerNorm(4*embed_dim),
             nn.Linear(in_features=4*embed_dim, out_features=16, bias=True),
             nn.Dropout(p=0.5),
+
             nn.Linear(in_features=16, out_features=1, bias=True),
             Reduce()
         )
@@ -106,8 +108,10 @@ class UltraSwin(pl.LightningModule):
         #x = x.transpose(1, 2) # n hxw c
 
         return x
+
     def forward_head(self, x):
-        x = self.avg_pool(x)
+        # input ==> n c d h w
+        x = self.avg_pool(x) # n c d h w
         x = self.dropout(x)
         x = x.view(x.shape[0], -1)
         x = self.ejection2(x)
@@ -115,8 +119,8 @@ class UltraSwin(pl.LightningModule):
         return x
 
     def forward(self, x):
-        x = self.forward_features(x)
-        x = self.forward_head(x)
+        x = self.forward_features(x) # n c d h w
+        x = self.forward_head(x) # n f
         #print(x.shape)
         return x
 
@@ -139,13 +143,14 @@ class UltraSwin(pl.LightningModule):
         #self.train_mae(y_hat, ejection)
         #r2loss = r2_loss(y_hat, ejection)
 
-        #self.log('train_loss', loss, batch_size=self.batch_size)
+        self.log('loss', loss, on_step=True, on_epoch=True)
         #self.log('train_mse', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
         #self.log('train_mae', self.train_mse, on_step=True, on_epoch=False, batch_size=self.batch_size)
         #self.log('train_r2', r2loss, on_step=True, on_epoch=False, batch_size=self.batch_size)
         
-        tensorboard_logs = {'loss':{'train': loss.detach() } }
-        return {"loss": loss, 'log': tensorboard_logs }
+        #tensorboard_logs = {'loss':{'train': loss.detach() } }
+        #return {"loss": loss, 'log': tensorboard_logs }
+        return loss
 
     def validation_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
@@ -157,25 +162,18 @@ class UltraSwin(pl.LightningModule):
         y_hat = self(nvideo) 
         loss = mse_loss(y_hat, ejection)
 
-        self.val_mse(y_hat, ejection)
+        self.val_rmse(y_hat, ejection)
         self.val_mae(y_hat, ejection)
-        #self.val_r2(y_hat.view(-1), ejection.view(-1))
-        r2loss = r2_loss(y_hat, ejection)
+        self.val_r2(y_hat, ejection)
+        #r2loss = r2_score(y_hat, ejection)
 
         self.log('val_loss', loss, batch_size=self.batch_size)
-        self.log('val_mse', self.val_mse, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('val_rmse', self.val_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('val_mae', self.val_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('val_r2', r2loss, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
-        tensorboard_logs = {'loss':{'val': loss.detach() } }
-        return {"val_loss": loss, 'log': tensorboard_logs }
-
-    def validation_epoch_end(self, outputs):
-        val_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
-
-        log = {"avg_val_loss": val_loss}
-        self.log("avg_val_loss", val_loss)
-        return {"log": log, "val_loss": val_loss}
+        #tensorboard_logs = {'loss':{'val': loss.detach() } }
+        #return {"val_loss": loss, 'log': tensorboard_logs }
 
     def test_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
@@ -187,17 +185,17 @@ class UltraSwin(pl.LightningModule):
         y_hat = self(nvideo) 
         loss = mse_loss(y_hat, ejection)
         
-        self.test_mse(y_hat, ejection)
+        self.test_rmse(y_hat, ejection)
         self.test_mae(y_hat, ejection)
-        #self.test_r2(y_hat.view(-1), ejection.view(-1))
-        r2loss = r2_loss(y_hat, ejection)
+        self.test_r2(y_hat, ejection)
+        #r2loss = r2_score(y_hat, ejection)
 
         self.log('test_loss', loss, batch_size=self.batch_size)
-        self.log('test_mse', self.test_mse, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_r2', r2loss, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_r2', self.test_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
-        return loss
+        #return loss
 
     def predict_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
