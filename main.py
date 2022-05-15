@@ -10,7 +10,7 @@ parser.add_argument("--mode", type=str, default="train", help="Train or test")
 parser.add_argument("--pretrained", type=str, default="pretrained/swin_base_patch4_window12_384_22k.pth", help="File pretrained swin")
 parser.add_argument("--data_dir", type=str, default="datasets/EchoNet", help="Path ke datasets")
 parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
-parser.add_argument("--embed_dim", type=int, default=96, help="Embed dimension")
+parser.add_argument("--embed_dim", type=int, default=128, help="Embed dimension")
 parser.add_argument("--frozen_stages", type=int, default=3, help="Frozen stages")
 parser.add_argument("--ckpt_path", type=str, default=None, help="Checkpoint path")
 parser.add_argument("--max_epochs", type=int, default=100, help="Max epochs")
@@ -44,7 +44,8 @@ if __name__ == '__main__':
 
     ultra_swin = UltraSwin(pretrained, 
                     embed_dim=embed_dim, 
-                    depths=[2, 2, 6, 2], 
+                    depths=[2, 2, 18, 2], 
+                    num_heads=[4, 8, 16, 32], 
                     frozen_stages=frozen_stages, 
                     batch_size=batch_size)
 

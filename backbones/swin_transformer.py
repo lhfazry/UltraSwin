@@ -658,6 +658,7 @@ class SwinTransformer3D(nn.Module):
 
         for layer in self.layers:
             x = layer(x.contiguous())
+            #print(f'layer ==> {x.shape}')
 
         x = rearrange(x, 'n c d h w -> n d h w c')
         x = self.norm(x)
