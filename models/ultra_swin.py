@@ -125,14 +125,18 @@ class UltraSwin(pl.LightningModule):
         return x
 
     def forward(self, x):
-        x1, x2, x3, x4 = self.forward_features(x) # n c d h w
+        #x1, x2, x3, x4 = self.forward_features(x) # n c d h w
 
-        if self.multi_stage_training:
-            x = self.forward_head(x4) # n f
-        else:
-            x = self.forward_head(x4) # n f
+        #if self.multi_stage_training:
+        #    x = self.forward_head(x4) # n f
+        #else:
+        #    x = self.forward_head(x4) # n f
 
         #print(x.shape)
+
+        x = self.forward_features(x) # n c d h w
+        x = self.forward_head(x) # n f
+        
         return x
 
     def training_step(self, batch, batch_idx):
@@ -218,7 +222,7 @@ class UltraSwin(pl.LightningModule):
         return {'filename': filename, 'EF': ejection * 100., 'Pred': y_hat * 100., 'loss': loss * 100.}
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=10e-4)
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1, verbose=True)
+        optimizer = torch.optim.AdamW(self.parameters(), lr=10e-5, weight_decay=0.01)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1, verbose=True)
 
         return [optimizer], [lr_scheduler]
