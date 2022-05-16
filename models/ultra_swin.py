@@ -136,7 +136,7 @@ class UltraSwin(pl.LightningModule):
 
         x = self.forward_features(x) # n c d h w
         x = self.forward_head(x) # n f
-        
+
         return x
 
     def training_step(self, batch, batch_idx):
@@ -179,13 +179,13 @@ class UltraSwin(pl.LightningModule):
 
         self.val_rmse(y_hat, ejection)
         self.val_mae(y_hat, ejection)
-        #self.val_r2(y_hat, ejection)
-        r2loss = r2_score(y_hat, ejection)
+        self.val_r2(y_hat, ejection)
+        #r2loss = r2_score(y_hat, ejection)
 
         self.log('val_loss', loss, batch_size=self.batch_size)
         self.log('val_rmse', self.val_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('val_mae', self.val_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('val_r2', r2loss, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
         #tensorboard_logs = {'loss':{'val': loss.detach() } }
         #return {"val_loss": loss, 'log': tensorboard_logs }
@@ -202,13 +202,13 @@ class UltraSwin(pl.LightningModule):
         
         self.test_rmse(y_hat, ejection)
         self.test_mae(y_hat, ejection)
-        #self.test_r2(y_hat, ejection)
-        r2loss = r2_score(y_hat, ejection)
+        self.test_r2(y_hat, ejection)
+        #r2loss = r2_score(y_hat, ejection)
 
         self.log('test_loss', loss, batch_size=self.batch_size)
         self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_r2', r2loss, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_r2', self.test_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
         #return loss
 
