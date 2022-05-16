@@ -199,6 +199,7 @@ class EchoSet(torch.utils.data.Dataset):
             #print(f'before video size: {nvideo.shape}')
             if self.augmented:
                 nvideo = np.asarray(self.vid_augs(nvideo))
+                
             #print(f'after video size: {np.asarray(nvideo).shape}')
             return filename, nvideo, nlabel, ejection, repeat, self.fps[index]
         

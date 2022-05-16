@@ -1,7 +1,9 @@
+from tabnanny import verbose
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 import torchmetrics
+import torch.nn.functional as F
 
 from torch.nn import functional as F
 from backbones.swin_transformer import SwinTransformer3D
@@ -11,6 +13,7 @@ from losses.mse import mse_loss
 from losses.r2 import r2_loss
 from sklearn.metrics import r2_score
 from losses.rmse import RMSE
+
 
 class UltraSwin(pl.LightningModule):
     def __init__(self,
@@ -89,7 +92,8 @@ class UltraSwin(pl.LightningModule):
             nn.Dropout(p=0.5),
 
             nn.Linear(in_features=16, out_features=1, bias=True),
-            Reduce()
+            Reduce(),
+            nn.Sigmoid()
         )
 
         self.dropout = nn.Dropout(p=0.5)
@@ -137,7 +141,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection: {ejection.data}')
         #print(f'y_hat: {y_hat.data}')
 
-        loss = mse_loss(y_hat, ejection)
+        loss = F.mse_loss(y_hat, ejection)
         
         #self.train_mse(y_hat, ejection)
         #self.train_mae(y_hat, ejection)
@@ -207,7 +211,7 @@ class UltraSwin(pl.LightningModule):
         return {'filename': filename, 'EF': ejection * 100., 'Pred': y_hat * 100., 'loss': loss * 100.}
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=10e-3)
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1)
+        optimizer = torch.optim.Adam(self.parameters(), lr=10e-4)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.005, verbose=True)
 
         return [optimizer], [lr_scheduler]
