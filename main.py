@@ -19,6 +19,7 @@ parser.add_argument("--accelerator", type=str, default='cpu', help="Accelerator"
 parser.add_argument("--dataset_mode", type=str, default='repeat', help="Dataset Mode")
 parser.add_argument("--logs_dir", type=str, default='lightning_logs', help="Log dir")
 parser.add_argument("--multi_stage_training", action='store_true', help="Multi stage training")
+parser.add_argument("--log", action='store_true', help="log")
 
 params = parser.parse_args()
 
@@ -36,6 +37,7 @@ if __name__ == '__main__':
     dataset_mode = params.dataset_mode
     logs_dir = params.logs_dir
     multi_stage_training = params.multi_stage_training
+    log = params.log
 
     logger = TensorBoardLogger(save_dir=logs_dir, name="ultraswin")
 
@@ -64,11 +66,20 @@ if __name__ == '__main__':
         trainer.fit(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
 
     if mode == 'validate':
+        if not log:
+            trainer.logger = False
+
         trainer.validate(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
 
     if mode == 'test':
+        if not log:
+            trainer.logger = False
+
         trainer.test(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
 
     if mode == 'predict':
+        if not log:
+            trainer.logger = False
+
         predicts = trainer.predict(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
         print(predicts)
