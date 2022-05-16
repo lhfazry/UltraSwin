@@ -34,10 +34,12 @@ class UltraSwin(pl.LightningModule):
                  patch_norm=False,
                  frozen_stages=-1,
                  use_checkpoint=False, 
-                 batch_size=8):
+                 batch_size=8, 
+                 multi_stage_training=False):
         super().__init__()
         self.save_hyperparameters()
         self.batch_size = batch_size
+        self.multi_stage_training = multi_stage_training
 
         #self.train_rmse = RMSE()
         #self.train_mae = torchmetrics.MeanAbsoluteError()
@@ -123,8 +125,13 @@ class UltraSwin(pl.LightningModule):
         return x
 
     def forward(self, x):
-        x = self.forward_features(x) # n c d h w
-        x = self.forward_head(x) # n f
+        x1, x2, x3, x4 = self.forward_features(x) # n c d h w
+
+        if self.multi_stage_training:
+            x = self.forward_head(x4) # n f
+        else:
+            x = self.forward_head(x4) # n f
+
         #print(x.shape)
         return x
 
@@ -164,17 +171,17 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo) 
-        loss = mse_loss(y_hat, ejection)
+        loss = F.mse_loss(y_hat, ejection)
 
         self.val_rmse(y_hat, ejection)
         self.val_mae(y_hat, ejection)
-        self.val_r2(y_hat, ejection)
-        #r2loss = r2_score(y_hat, ejection)
+        #self.val_r2(y_hat, ejection)
+        r2loss = r2_score(y_hat, ejection)
 
         self.log('val_loss', loss, batch_size=self.batch_size)
         self.log('val_rmse', self.val_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('val_mae', self.val_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('val_r2', r2loss, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
         #tensorboard_logs = {'loss':{'val': loss.detach() } }
         #return {"val_loss": loss, 'log': tensorboard_logs }
@@ -187,17 +194,17 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo) 
-        loss = mse_loss(y_hat, ejection)
+        loss = F.mse_loss(y_hat, ejection)
         
         self.test_rmse(y_hat, ejection)
         self.test_mae(y_hat, ejection)
-        self.test_r2(y_hat, ejection)
-        #r2loss = r2_score(y_hat, ejection)
+        #self.test_r2(y_hat, ejection)
+        r2loss = r2_score(y_hat, ejection)
 
         self.log('test_loss', loss, batch_size=self.batch_size)
         self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_r2', self.test_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_r2', r2loss, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
         #return loss
 
@@ -207,7 +214,7 @@ class UltraSwin(pl.LightningModule):
 
         y_hat = self(nvideo) 
 
-        loss = nn.MSELoss(reduction='none')(y_hat, ejection)
+        loss = F.mse_loss(y_hat, ejection)
         return {'filename': filename, 'EF': ejection * 100., 'Pred': y_hat * 100., 'loss': loss * 100.}
 
     def configure_optimizers(self):

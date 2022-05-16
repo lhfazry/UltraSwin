@@ -18,6 +18,7 @@ parser.add_argument("--num_workers", type=int, default=8, help="num_workers")
 parser.add_argument("--accelerator", type=str, default='cpu', help="Accelerator")
 parser.add_argument("--dataset_mode", type=str, default='repeat', help="Dataset Mode")
 parser.add_argument("--logs_dir", type=str, default='lightning_logs', help="Log dir")
+parser.add_argument("--multi_stage_training", action='store_true', help="Multi stage training")
 
 params = parser.parse_args()
 
@@ -34,6 +35,7 @@ if __name__ == '__main__':
     accelerator = params.accelerator
     dataset_mode = params.dataset_mode
     logs_dir = params.logs_dir
+    multi_stage_training = params.multi_stage_training
 
     logger = TensorBoardLogger(save_dir=logs_dir, name="ultraswin")
 
@@ -47,7 +49,8 @@ if __name__ == '__main__':
                     depths=[2, 2, 18, 2], 
                     num_heads=[4, 8, 16, 32], 
                     frozen_stages=frozen_stages, 
-                    batch_size=batch_size)
+                    batch_size=batch_size, 
+                    multi_stage_training=multi_stage_training)
 
     trainer = pl.Trainer(accelerator=accelerator, 
                 max_epochs=max_epochs, 

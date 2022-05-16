@@ -655,16 +655,19 @@ class SwinTransformer3D(nn.Module):
         x = self.patch_embed(x)
 
         x = self.pos_drop(x)
+        data = []
 
         for layer in self.layers:
             x = layer(x.contiguous())
             #print(f'layer ==> {x.shape}')
 
-        x = rearrange(x, 'n c d h w -> n d h w c')
-        x = self.norm(x)
-        x = rearrange(x, 'n d h w c -> n c d h w')
+            x = rearrange(x, 'n c d h w -> n d h w c')
+            x = self.norm(x)
+            x = rearrange(x, 'n d h w c -> n c d h w')
 
-        return x
+            data.append(x)
+
+        return data
 
     def train(self, mode=True):
         """Convert the model into training mode while keep layers freezed."""
