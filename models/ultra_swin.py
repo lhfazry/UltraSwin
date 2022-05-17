@@ -147,7 +147,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
 
-        y_hat = self(nvideo) 
+        y_hat = self(nvideo)
 
         #print(f'ejection: {ejection.data}')
         #print(f'y_hat: {y_hat.data}')
@@ -174,7 +174,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
 
-        y_hat = self(nvideo) 
+        y_hat = self(nvideo)
         loss = F.mse_loss(y_hat, ejection)
 
         self.val_rmse(y_hat, ejection)
@@ -197,7 +197,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
 
-        y_hat = self(nvideo) 
+        y_hat = self.model(nvideo) 
         loss = F.mse_loss(y_hat, ejection)
         
         self.test_rmse(y_hat, ejection)
@@ -216,13 +216,13 @@ class UltraSwin(pl.LightningModule):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
         ejection = ejection.type(torch.float32) / 100.
 
-        y_hat = self(nvideo) 
+        y_hat = self(nvideo)
 
         loss = F.mse_loss(y_hat, ejection)
         return {'filename': filename, 'EF': ejection * 100., 'Pred': y_hat * 100., 'loss': loss * 100.}
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=1e-5, weight_decay=0.01)
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1, verbose=True)
+        #lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1, verbose=True)
 
-        return [optimizer], [lr_scheduler]
+        return [optimizer]#, [lr_scheduler]
