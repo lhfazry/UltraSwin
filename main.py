@@ -10,7 +10,7 @@ parser.add_argument("--mode", type=str, default="train", help="Train or test")
 parser.add_argument("--pretrained", type=str, default="pretrained/swin_base_patch4_window12_384_22k.pth", help="File pretrained swin")
 parser.add_argument("--data_dir", type=str, default="datasets/EchoNet", help="Path ke datasets")
 parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
-parser.add_argument("--embed_dim", type=int, default=128, help="Embed dimension")
+#parser.add_argument("--embed_dim", type=int, default=128, help="Embed dimension")
 parser.add_argument("--frozen_stages", type=int, default=3, help="Frozen stages")
 parser.add_argument("--ckpt_path", type=str, default=None, help="Checkpoint path")
 parser.add_argument("--max_epochs", type=int, default=100, help="Max epochs")
@@ -18,6 +18,7 @@ parser.add_argument("--num_workers", type=int, default=8, help="num_workers")
 parser.add_argument("--accelerator", type=str, default='cpu', help="Accelerator")
 parser.add_argument("--dataset_mode", type=str, default='repeat', help="Dataset Mode")
 parser.add_argument("--logs_dir", type=str, default='lightning_logs', help="Log dir")
+parser.add_argument("--variant", type=str, default='base', help="Variant model")
 parser.add_argument("--multi_stage_training", action='store_true', help="Multi stage training")
 parser.add_argument("--log", action='store_true', help="log")
 
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     data_dir = params.data_dir
     pretrained = params.pretrained
     batch_size = params.batch_size
-    embed_dim = params.embed_dim
+    #embed_dim = params.embed_dim
     frozen_stages = params.frozen_stages
     ckpt_path = params.ckpt_path
     max_epochs = params.max_epochs
@@ -38,6 +39,7 @@ if __name__ == '__main__':
     logs_dir = params.logs_dir
     multi_stage_training = params.multi_stage_training
     log = params.log
+    variant = params.variant
 
     logger = TensorBoardLogger(save_dir=logs_dir, name="ultraswin")
 
@@ -46,10 +48,19 @@ if __name__ == '__main__':
                         num_workers=num_workers, 
                         dataset_mode=dataset_mode)
 
+    if variant == 'small':
+        depths = [2, 2, 18, 2]
+        num_heads = [3, 6, 12, 24]
+        embed_dim = 96
+    else: # base
+        depths = [2, 2, 18, 2]
+        num_heads = [4, 8, 16, 32]
+        embed_dim = 128
+
     ultra_swin = UltraSwin(pretrained, 
                     embed_dim=embed_dim, 
-                    depths=[2, 2, 18, 2], 
-                    num_heads=[4, 8, 16, 32], 
+                    depths=depths, 
+                    num_heads=num_heads, 
                     frozen_stages=frozen_stages, 
                     batch_size=batch_size, 
                     multi_stage_training=multi_stage_training)
