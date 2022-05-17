@@ -198,8 +198,11 @@ class EchoSet(torch.utils.data.Dataset):
             
             #print(f'before video size: {nvideo.shape}')
             if self.augmented:
-                nvideo = np.asarray(self.vid_augs(nvideo))
-                
+                # (3, 0, 1, 2) ==> (0, 1, 2, 3)
+                vid = nvideo.transpose((1, 2, 3, 0))
+                vid = np.asarray(self.vid_augs(vid))
+                nvideo = vid.transpose((3, 0, 1, 2))
+
             #print(f'after video size: {np.asarray(nvideo).shape}')
             return filename, nvideo, nlabel, ejection, repeat, self.fps[index]
         
@@ -234,7 +237,9 @@ class EchoSet(torch.utils.data.Dataset):
             fps         = self.fps[index]
             
             if self.augmented:
-                video = np.asarray(self.vid_augs(video))
+                vid = video.transpose((1, 2, 3, 0))
+                vid = np.asarray(self.vid_augs(vid))
+                video = vid.transpose((3, 0, 1, 2))
 
             return filename, video, label, ejection, repeat, fps
         
@@ -328,7 +333,9 @@ class EchoSet(torch.utils.data.Dataset):
                 raise ValueError('WTF??', self.fixed_length, window_width, video.shape[0], label.shape[0])
             
             if self.augmented:
-                video = np.asarray(self.vid_augs(video))
+                vid = video.transpose((1, 2, 3, 0))
+                vid = np.asarray(self.vid_augs(vid))
+                video = vid.transpose((3, 0, 1, 2))
             
             return filename, video, label, ejection, repeat, fps
         
