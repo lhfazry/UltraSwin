@@ -197,7 +197,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
 
-        y_hat = self.model(nvideo) 
+        y_hat = self(nvideo) 
         loss = F.mse_loss(y_hat, ejection)
         
         self.test_rmse(y_hat, ejection)
