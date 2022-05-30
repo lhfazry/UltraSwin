@@ -644,7 +644,8 @@ class SwinTransformer3D(nn.Module):
             else:
                 # Directly load 3D model.
                 #load_checkpoint(self, self.pretrained, strict=False, logger=logger)
-                print('')
+                self.load_state_dict(torch.load(self.pretrained))
+                #print('')
         elif self.pretrained is None:
             self.apply(_init_weights)
         else:
