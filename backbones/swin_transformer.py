@@ -457,7 +457,7 @@ class PatchEmbed3D(nn.Module):
 
         return x
 
-#@BACKBONES.register_module()
+#@BACKBONES.register_module()   
 class SwinTransformer3D(nn.Module):
     """ Swin Transformer backbone.
         A PyTorch impl of : `Swin Transformer: Hierarchical Vision Transformer using Shifted Windows`  -
