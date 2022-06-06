@@ -11,7 +11,7 @@ parser.add_argument("--pretrained", type=str, default="pretrained/swin_base_patc
 parser.add_argument("--data_dir", type=str, default="datasets/EchoNet", help="Path ke datasets")
 parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
 #parser.add_argument("--embed_dim", type=int, default=128, help="Embed dimension")
-parser.add_argument("--frozen_stages", type=int, default=-1, help="Frozen stages")
+parser.add_argument("--frozen_stages", type=int, default=3, help="Frozen stages")
 parser.add_argument("--ckpt_path", type=str, default=None, help="Checkpoint path")
 parser.add_argument("--max_epochs", type=int, default=100, help="Max epochs")
 parser.add_argument("--num_workers", type=int, default=8, help="num_workers")

@@ -545,7 +545,7 @@ class SwinTransformer3D(nn.Module):
 
         # add a norm layer for each output
         self.norm = norm_layer(self.num_features)
-
+        self.init_weights(pretrained)
         self._freeze_stages()
 
     def _freeze_stages(self):
@@ -612,6 +612,8 @@ class SwinTransformer3D(nn.Module):
         msg = self.load_state_dict(state_dict, strict=False)
         logger.info(msg)
         logger.info(f"=> loaded successfully '{self.pretrained}'")
+        print(msg)
+        print(f"=> loaded successfully '{self.pretrained}'")
         del checkpoint
         torch.cuda.empty_cache()
 
