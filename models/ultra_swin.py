@@ -93,7 +93,7 @@ class UltraSwin(pl.LightningModule):
             #nn.Dropout(p=0.5),
 
             nn.Linear(in_features=16, out_features=1, bias=True),
-            #Reduce(),
+            Reduce(),
             nn.Sigmoid()
         )
 
@@ -120,7 +120,7 @@ class UltraSwin(pl.LightningModule):
         x = self.avg_pool(x) # n c d' h' w'
         x = self.dropout(x)
         x = x.view(x.shape[0], -1)
-        x = self.ejection2(x)
+        x = self.ejection(x)
 
         return x
 
