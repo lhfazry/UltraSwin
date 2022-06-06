@@ -1,7 +1,7 @@
 #!/bin/bash
 CUDA_VISIBLE_DEVICES=0 python main.py \
     --data_dir=/workspace/EchoNet \
-    --pretrained=pretrained/swin_base_patch244_window877_kinetics400_22k.pth \
+    --pretrained=pretrained/swin_base_patch4_window7_224_22k.pth \
     --batch_size=2 \
     --num_workers=4 \
     --accelerator=gpu \

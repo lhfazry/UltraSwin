@@ -613,7 +613,7 @@ class SwinTransformer3D(nn.Module):
         logger.info(msg)
         logger.info(f"=> loaded successfully '{self.pretrained}'")
         print(msg)
-        print(f"=> loaded successfully '{self.pretrained}'")
+        print(f"=> Weights loaded successfully from '{self.pretrained}'")
         del checkpoint
         torch.cuda.empty_cache()
 

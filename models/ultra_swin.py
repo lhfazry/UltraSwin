@@ -55,7 +55,7 @@ class UltraSwin(pl.LightningModule):
 
         self.swin_transformer = SwinTransformer3D(
             pretrained=pretrained,
-            pretrained2d=False,
+            pretrained2d=True,
             patch_size=patch_size,
             in_chans=in_chans,
             embed_dim=embed_dim,
