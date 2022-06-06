@@ -202,8 +202,8 @@ class EchoSet(torch.utils.data.Dataset):
                 # (3, 0, 1, 2) ==> (0, 1, 2, 3)
                 # (F, C, H, W)
                 vid = nvideo.transpose((0, 2, 3, 1)) # (F, H, W, C) 
-                nvideo = np.asarray(self.vid_augs(vid)) # (F, C, H, W) ==> for swin transformer
-                #nvideo = vid.transpose((0, 3, 1, 2)) # (F, C, H, W) ==> for swin transformer
+                vid = np.asarray(self.vid_augs(vid)) # (F, H, W, C)
+                nvideo = vid.transpose((0, 3, 1, 2)) # (F, C, H, W)
 
             #print(f'after video size: {np.asarray(nvideo).shape}')
             return filename, nvideo, nlabel, ejection, repeat, self.fps[index]

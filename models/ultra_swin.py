@@ -74,7 +74,6 @@ class UltraSwin(pl.LightningModule):
             use_checkpoint=use_checkpoint
         )
         
-        self.avgpool = nn.AdaptiveAvgPool1d(1)
         self.ejection = nn.Sequential(
             nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
             nn.LayerNorm(4*embed_dim),
@@ -87,24 +86,25 @@ class UltraSwin(pl.LightningModule):
         self.ejection2 = nn.Sequential(
             nn.LayerNorm(8*embed_dim),
             nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
-            nn.Dropout(p=0.5),
+            #nn.Dropout(p=0.5),
             
             nn.LayerNorm(4*embed_dim),
             nn.Linear(in_features=4*embed_dim, out_features=16, bias=True),
-            nn.Dropout(p=0.5),
+            #nn.Dropout(p=0.5),
 
             nn.Linear(in_features=16, out_features=1, bias=True),
-            Reduce(),
+            #Reduce(),
             nn.Sigmoid()
         )
 
         self.dropout = nn.Dropout(p=0.5)
-        self.avg_pool = nn.AdaptiveAvgPool3d((1, 1, 1))
+        self.avg_pool = nn.AdaptiveAvgPool3d((1, 1, 1)) # output size ==> d' x h' x w'
         self.ef_regressor = nn.Linear(in_features=8*embed_dim, out_features=1, bias=True)
         self.reduce = Reduce()
 
     def forward_features(self, x):
         #print(f'1: {x.shape}')
+        # (N, D, C, H, W)
         x = rearrange(x, 'n d c h w -> n c d h w')
 
         x = self.swin_transformer(x) # n c d h w ==> torch.Size([1, 768, 32, 4, 4])
@@ -117,7 +117,7 @@ class UltraSwin(pl.LightningModule):
 
     def forward_head(self, x):
         # input ==> n c d h w
-        x = self.avg_pool(x) # n c d h w
+        x = self.avg_pool(x) # n c d' h' w'
         x = self.dropout(x)
         x = x.view(x.shape[0], -1)
         x = self.ejection2(x)
