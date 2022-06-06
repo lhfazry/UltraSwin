@@ -7,7 +7,7 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--mode", type=str, default="train", help="Train or test")
-parser.add_argument("--pretrained", type=str, default="pretrained/swin_base_patch4_window12_384_22k.pth", help="File pretrained swin")
+parser.add_argument("--pretrained", type=str, default="pretrained/swin_base_patch4_window7_224_22k.pth", help="File pretrained swin")
 parser.add_argument("--data_dir", type=str, default="datasets/EchoNet", help="Path ke datasets")
 parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
 #parser.add_argument("--embed_dim", type=int, default=128, help="Embed dimension")
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     else: # base
         depths = [2, 2, 18, 2]
         num_heads = [4, 8, 16, 32]
-        embed_dim = 128
+        embed_dim = 128 
 
     ultra_swin = UltraSwin(pretrained, 
                     embed_dim=embed_dim, 
