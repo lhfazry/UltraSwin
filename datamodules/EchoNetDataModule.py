@@ -5,9 +5,9 @@ from datasets.EchoSet import EchoSet
 
 class EchoNetDataModule(pl.LightningDataModule):
     def __init__(self, data_dir: str = "datasets/EchoNet", 
-        batch_size: int = 32, 
-        num_workers: int = 8, 
-        dataset_mode: str = 'repeat'):
+            batch_size: int = 32, 
+            num_workers: int = 8, 
+            dataset_mode: str = 'repeat'):
         super().__init__()
 
         self.data_dir = data_dir

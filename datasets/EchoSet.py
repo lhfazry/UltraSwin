@@ -149,6 +149,7 @@ class EchoSet(torch.utils.data.Dataset):
                 small_key = self.frames[key][0]
                 
             # Frames, Channel, Height, Width
+            # (F, C, H, W)
             f, c, h, w = video.shape
             
             first_poi = min(small_key, large_key)
@@ -199,9 +200,10 @@ class EchoSet(torch.utils.data.Dataset):
             #print(f'before video size: {nvideo.shape}')
             if self.augmented:
                 # (3, 0, 1, 2) ==> (0, 1, 2, 3)
-                vid = nvideo.transpose((1, 2, 3, 0))
-                vid = np.asarray(self.vid_augs(vid))
-                nvideo = vid.transpose((3, 0, 1, 2))
+                # (F, C, H, W)
+                vid = nvideo.transpose((0, 2, 3, 1)) # (F, H, W, C) 
+                nvideo = np.asarray(self.vid_augs(vid)) # (F, C, H, W) ==> for swin transformer
+                #nvideo = vid.transpose((0, 3, 1, 2)) # (F, C, H, W) ==> for swin transformer
 
             #print(f'after video size: {np.asarray(nvideo).shape}')
             return filename, nvideo, nlabel, ejection, repeat, self.fps[index]
@@ -379,7 +381,7 @@ def loadvideo(filename: str):
     frame_width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    v = np.zeros((frame_count, frame_width, frame_height, 3), np.uint8)
+    v = np.zeros((frame_count, frame_width, frame_height, 3), np.uint8) # (F, W, H, C)
 
     for count in range(frame_count):
         ret, frame = capture.read()
@@ -389,7 +391,7 @@ def loadvideo(filename: str):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         v[count] = frame
 
-    v = v.transpose((3, 0, 1, 2))
+    v = v.transpose((3, 0, 1, 2)) #(C, F, H, W)
 
     assert v.size > 0
 

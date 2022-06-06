@@ -39,7 +39,8 @@ video2 = np.asarray(vid_augs2(video2)).astype(np.uint8)
 video3 = loadvideo(os.path.join(video_dir, files[12])).astype(np.float32)
 video3 = np.asarray(vid_augs3(video3)).astype(np.uint8)
 
-video4 = loadvideo(os.path.join(video_dir, files[13])).astype(np.float32)
+video4 = loadvideo(os.path.join(video_dir, files[13])).astype(np.float32) #(C, F, H, W)   
+video4 = video4.transpose((1, 2, 3, 0)) #(F, H, W, C) 
 video4 = np.asarray(vid_augs4(video4)).astype(np.uint8)
 
 
