@@ -119,7 +119,7 @@ class UltraSwin(pl.LightningModule):
         # input ==> n c d h w
         x = self.avg_pool(x) # n c 1 1 1
         x = self.dropout(x)
-        x = x.view(x.shape[0], -1)
+        x = x.view(x.shape[0], -1) # n c
         x = self.ejection(x)
 
         return x # n c
