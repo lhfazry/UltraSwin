@@ -80,7 +80,12 @@ class UltraSwin(pl.LightningModule):
 
             nn.LayerNorm(4*embed_dim),
             #nn.LeakyReLU(negative_slope=0.05, inplace=True),
-            nn.Linear(in_features=4*embed_dim, out_features=1, bias=True),
+            nn.Linear(in_features=4*embed_dim, out_features=2*embed_dim, bias=True),
+
+            nn.LayerNorm(2*embed_dim),
+            #nn.LeakyReLU(negative_slope=0.05, inplace=True),
+            nn.Linear(in_features=2*embed_dim, out_features=1, bias=True),
+
             Reduce(),
             nn.Sigmoid()
         )
