@@ -72,7 +72,7 @@ if __name__ == '__main__':
                 enable_model_summary=True,
                 logger=logger,
                 precision=16,
-                accumulate_grad_batches=2,
+                accumulate_grad_batches=1,
                 callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=10)])
 
     if mode == 'train':
