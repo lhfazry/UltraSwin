@@ -134,9 +134,6 @@ class EchoSet(torch.utils.data.Dataset):
             video = loadvideo(path).astype(np.float32)
             key = os.path.splitext(self.fnames[index])[0]
 
-            # Scale pixel values from 0-255 to 0-1
-            video /= 255.0
-
             video = np.moveaxis(video, 0, 1)
             
             samp_size = abs(self.frames[key][0]-self.frames[key][-1])
@@ -205,7 +202,13 @@ class EchoSet(torch.utils.data.Dataset):
                 vid = np.asarray(self.vid_augs(vid)) # (F, H, W, C)
                 nvideo = vid.transpose((0, 3, 1, 2)) # (F, C, H, W)
 
-            #print(f'after video size: {np.asarray(nvideo).shape}')
+            # Scale pixel values from 0-255 to 0-1
+            nvideo /= 255.0
+            
+            #saved_video = nvideo.transpose((0, 2, 3, 1))
+            #print(f'after video size: {saved_video.shape}: {filename}')
+            #save_video(filename + ".avi", np.asarray(saved_video).astype(np.uint8), 50)
+            #print(f'filename: {filename}, ejection: {ejection}')
             return filename, nvideo, nlabel, ejection, repeat, self.fps[index]
         
         elif self.mode == 'full':
@@ -396,3 +399,12 @@ def loadvideo(filename: str):
     assert v.size > 0
 
     return v
+
+def save_video(name, video, fps):
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    data = cv2.VideoWriter(name, fourcc, float(fps), (video.shape[1], video.shape[2]))
+
+    for v in video:
+        data.write(v)
+
+    data.release()

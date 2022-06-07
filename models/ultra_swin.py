@@ -80,7 +80,7 @@ class UltraSwin(pl.LightningModule):
             nn.LeakyReLU(negative_slope=0.05, inplace=True),
             nn.Linear(in_features=4*embed_dim, out_features=1, bias=True),
             Reduce(),
-            #nn.Sigmoid()
+            nn.Tanh()
         )
 
         self.ejection2 = nn.Sequential(
@@ -94,7 +94,7 @@ class UltraSwin(pl.LightningModule):
 
             nn.Linear(in_features=16, out_features=1, bias=True),
             Reduce(),
-            nn.Sigmoid()
+            nn.Tanh()
         )
 
         self.dropout = nn.Dropout(p=0.5)
@@ -142,7 +142,11 @@ class UltraSwin(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
 
-        #ejection = ejection.type(torch.float32) / 100.
+        #print(f'ejection before: {ejection}')
+        ejection = (ejection.type(torch.float32) - 50) / 100.
+        #print(f'ejection after: {ejection}')
+
+
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
