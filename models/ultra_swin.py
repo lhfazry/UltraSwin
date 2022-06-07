@@ -31,7 +31,7 @@ class UltraSwin(pl.LightningModule):
                  attn_drop_rate=0.,
                  drop_path_rate=0.2,
                  norm_layer=nn.LayerNorm,
-                 patch_norm=False,
+                 patch_norm=True,
                  frozen_stages=-1,
                  use_checkpoint=False, 
                  batch_size=8, 
