@@ -51,7 +51,7 @@ class EchoNetDataModule(pl.LightningDataModule):
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
             self.test_set   = EchoSet(root=self.data_dir,
-                                split="test",
+                                split="train",
                                 pad=8,
                                 random_clip=False,
                                 dataset_mode=self.dataset_mode)

@@ -75,7 +75,9 @@ class UltraSwin(pl.LightningModule):
         )
         
         self.ejection = nn.Sequential(
+            #nn.LayerNorm(8*embed_dim),
             nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
+
             nn.LayerNorm(4*embed_dim),
             #nn.LeakyReLU(negative_slope=0.05, inplace=True),
             nn.Linear(in_features=4*embed_dim, out_features=1, bias=True),
@@ -193,10 +195,10 @@ class UltraSwin(pl.LightningModule):
         self.val_r2(ef_pred, ef_label)
         #r2loss = r2_score(y_hat, ejection)
 
-        self.log('val_loss', loss, batch_size=self.batch_size)
-        self.log('val_rmse', self.val_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('val_mae', self.val_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('val_loss', loss, on_step=True, on_epoch=True)
+        self.log('val_rmse', self.val_rmse, on_step=True, on_epoch=True)
+        self.log('val_mae', self.val_mae, on_step=True, on_epoch=True)
+        self.log('val_r2', self.val_r2, on_step=True, on_epoch=True)
 
         #tensorboard_logs = {'loss':{'val': loss.detach() } }
         #return {"val_loss": loss, 'log': tensorboard_logs }
@@ -219,10 +221,10 @@ class UltraSwin(pl.LightningModule):
         self.test_r2(ef_pred, ef_label)
         #r2loss = r2_score(y_hat, ejection)
 
-        self.log('test_loss', loss, batch_size=self.batch_size)
-        self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_r2', self.test_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_loss', loss, on_step=True, on_epoch=True)
+        self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True)
+        self.log('test_mae', self.test_mae, on_step=True, on_epoch=True)
+        self.log('test_r2', self.test_r2, on_step=True, on_epoch=True)
 
         return {"test_loss": loss}
 
