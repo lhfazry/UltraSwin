@@ -6,4 +6,4 @@ CUDA_VISIBLE_DEVICES=0 python main.py \
     --num_workers=4 \
     --accelerator=gpu \
     --variant=base \
-    --max_epoch=1
+    --max_epoch=20
