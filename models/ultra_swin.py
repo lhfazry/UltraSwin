@@ -189,6 +189,7 @@ class UltraSwin(pl.LightningModule):
 
         #tensorboard_logs = {'loss':{'val': loss.detach() } }
         #return {"val_loss": loss, 'log': tensorboard_logs }
+        return {"val_loss": loss}
 
     def test_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
@@ -210,7 +211,7 @@ class UltraSwin(pl.LightningModule):
         self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('test_r2', self.test_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
-        #return loss
+        return {"test_loss": loss}
 
     def predict_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
@@ -223,6 +224,6 @@ class UltraSwin(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=1e-3)
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, verbose=True)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.85, verbose=True)
 
         return [optimizer], [lr_scheduler]
