@@ -75,7 +75,7 @@ class UltraSwin(pl.LightningModule):
         )
         
         self.ejection = nn.Sequential(
-            #nn.LayerNorm(8*embed_dim),
+            nn.LayerNorm(8*embed_dim),
             nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
 
             nn.LayerNorm(4*embed_dim),
@@ -221,7 +221,7 @@ class UltraSwin(pl.LightningModule):
         self.test_r2(ef_pred, ef_label)
         #r2loss = r2_score(y_hat, ejection)
 
-        self.log('test_loss', loss, on_step=True, on_epoch=True)
+        self.log('test_loss', loss)
         self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True)
         self.log('test_mae', self.test_mae, on_step=True, on_epoch=True)
         self.log('test_r2', self.test_r2, on_step=True, on_epoch=True)
