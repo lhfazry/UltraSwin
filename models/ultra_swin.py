@@ -148,7 +148,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection before: {ejection}')
         #ejection = (2 * ejection.type(torch.float32) / 100.) - 1
         #print(f'ejection after: {ejection}')
-        ef_label = ejection / 100.
+        ef_label = ejection.type(torch.float32) / 100.
 
 
         #print(f'nvideo.shape: {nvideo.shape}')
@@ -183,7 +183,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
-        ef_label = ejection / 100.
+        ef_label = ejection.type(torch.float32) / 100.
 
         ef_pred = self(nvideo)
         loss = F.huber_loss(ef_pred, ef_label)
@@ -209,7 +209,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
-        ef_label = ejection / 100.
+        ef_label = ejection.type(torch.float32) / 100.
 
         ef_pred = self(nvideo) 
         loss = F.huber_loss(ef_pred, ef_label)
