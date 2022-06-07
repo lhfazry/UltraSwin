@@ -77,12 +77,13 @@ class UltraSwin(pl.LightningModule):
         self.ejection = nn.Sequential(
             nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
             nn.LayerNorm(4*embed_dim),
-            nn.LeakyReLU(negative_slope=0.05, inplace=True),
+            #nn.LeakyReLU(negative_slope=0.05, inplace=True),
             nn.Linear(in_features=4*embed_dim, out_features=1, bias=True),
             Reduce(),
-            #nn.Tanh()
+            nn.Sigmoid()
         )
 
+        '''
         self.ejection2 = nn.Sequential(
             nn.LayerNorm(8*embed_dim),
             nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
@@ -96,10 +97,11 @@ class UltraSwin(pl.LightningModule):
             Reduce(),
             #nn.Tanh()
         )
+        '''
 
-        self.dropout = nn.Dropout(p=0.5)
+        #self.dropout = nn.Dropout(p=0.5)
         self.avg_pool = nn.AdaptiveMaxPool3d((1, 1, 1)) # output size ==> d' x h' x w'
-        self.ef_regressor = nn.Linear(in_features=8*embed_dim, out_features=1, bias=True)
+        #self.ef_regressor = nn.Linear(in_features=8*embed_dim, out_features=1, bias=True)
         self.reduce = Reduce()
 
     def forward_features(self, x):
@@ -117,6 +119,7 @@ class UltraSwin(pl.LightningModule):
 
     def forward_head(self, x):
         # input ==> n c d h w
+        #x = rearrange(x, 'n c d h w -> n c d h w')
         x = self.avg_pool(x) # n c 1 1 1
         #x = self.dropout(x)
         x = x.view(x.shape[0], -1) # n c
@@ -143,20 +146,21 @@ class UltraSwin(pl.LightningModule):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
 
         #print(f'ejection before: {ejection}')
-        ejection = (2 * ejection.type(torch.float32) / 100.) - 1
+        #ejection = (2 * ejection.type(torch.float32) / 100.) - 1
         #print(f'ejection after: {ejection}')
+        ef_label = ejection / 100.
 
 
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
 
-        y_hat = self(nvideo)
+        ef_pred = self(nvideo)
 
         #print(f'ejection: {ejection.data}')
         #print(f'y_hat: {y_hat.data}')
 
-        loss = F.mse_loss(y_hat, ejection)
+        loss = F.huber_loss(ef_pred, ef_label)
         #loss = F.huber_loss(y_hat, ejection)
         
         #self.train_mse(y_hat, ejection)
@@ -175,17 +179,18 @@ class UltraSwin(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
         #ejection = ejection.type(torch.float32) / 100.
-        ejection = (2 * ejection.type(torch.float32) / 100.) - 1
+        #ejection = (2 * ejection.type(torch.float32) / 100.) - 1
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
+        ef_label = ejection / 100.
 
-        y_hat = self(nvideo)
-        loss = F.mse_loss(y_hat, ejection)
+        ef_pred = self(nvideo)
+        loss = F.huber_loss(ef_pred, ef_label)
 
-        self.val_rmse(y_hat, ejection)
-        self.val_mae(y_hat, ejection)
-        self.val_r2(y_hat, ejection)
+        self.val_rmse(ef_pred, ef_label)
+        self.val_mae(ef_pred, ef_label)
+        self.val_r2(ef_pred, ef_label)
         #r2loss = r2_score(y_hat, ejection)
 
         self.log('val_loss', loss, batch_size=self.batch_size)
@@ -200,17 +205,18 @@ class UltraSwin(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
         #ejection = ejection.type(torch.float32) / 100.
-        ejection = (2 * ejection.type(torch.float32) / 100.) - 1
+        #ejection = (2 * ejection.type(torch.float32) / 100.) - 1
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
+        ef_label = ejection / 100.
 
-        y_hat = self(nvideo) 
-        loss = F.mse_loss(y_hat, ejection)
+        ef_pred = self(nvideo) 
+        loss = F.huber_loss(ef_pred, ef_label)
         
-        self.test_rmse(y_hat, ejection)
-        self.test_mae(y_hat, ejection)
-        self.test_r2(y_hat, ejection)
+        self.test_rmse(ef_pred, ef_label)
+        self.test_mae(ef_pred, ef_label)
+        self.test_r2(ef_pred, ef_label)
         #r2loss = r2_score(y_hat, ejection)
 
         self.log('test_loss', loss, batch_size=self.batch_size)
