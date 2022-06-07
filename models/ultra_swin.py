@@ -143,7 +143,7 @@ class UltraSwin(pl.LightningModule):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
 
         #print(f'ejection before: {ejection}')
-        ejection = (ejection.type(torch.float32) - 50) / 100.
+        ejection = (2 * ejection.type(torch.float32) / 100.) - 1
         #print(f'ejection after: {ejection}')
 
 
