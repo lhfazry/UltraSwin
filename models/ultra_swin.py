@@ -98,7 +98,7 @@ class UltraSwin(pl.LightningModule):
         )
 
         self.dropout = nn.Dropout(p=0.5)
-        self.avg_pool = nn.AdaptiveAvgPool3d((1, 1, 1)) # output size ==> d' x h' x w'
+        self.avg_pool = nn.AdaptiveMaxPool3d((1, 1, 1)) # output size ==> d' x h' x w'
         self.ef_regressor = nn.Linear(in_features=8*embed_dim, out_features=1, bias=True)
         self.reduce = Reduce()
 
@@ -156,8 +156,8 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection: {ejection.data}')
         #print(f'y_hat: {y_hat.data}')
 
-        #loss = F.mse_loss(y_hat, ejection)
-        loss = F.l1_loss(y_hat, ejection)
+        loss = F.mse_loss(y_hat, ejection)
+        #loss = F.huber_loss(y_hat, ejection)
         
         #self.train_mse(y_hat, ejection)
         #self.train_mae(y_hat, ejection)
@@ -181,7 +181,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo)
-        loss = F.l1_loss(y_hat, ejection)
+        loss = F.mse_loss(y_hat, ejection)
 
         self.val_rmse(y_hat, ejection)
         self.val_mae(y_hat, ejection)
@@ -206,7 +206,7 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         y_hat = self(nvideo) 
-        loss = F.l1_loss(y_hat, ejection)
+        loss = F.mse_loss(y_hat, ejection)
         
         self.test_rmse(y_hat, ejection)
         self.test_mae(y_hat, ejection)
