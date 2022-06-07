@@ -118,7 +118,7 @@ class UltraSwin(pl.LightningModule):
     def forward_head(self, x):
         # input ==> n c d h w
         x = self.avg_pool(x) # n c 1 1 1
-        x = self.dropout(x)
+        #x = self.dropout(x)
         x = x.view(x.shape[0], -1) # n c
         x = self.ejection(x)
 
@@ -223,7 +223,7 @@ class UltraSwin(pl.LightningModule):
         return {'filename': filename, 'EF': ejection * 100., 'Pred': y_hat * 100., 'loss': loss * 100.}
 
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), lr=1e-3)
+        optimizer = torch.optim.AdamW(self.parameters(), lr=1e-4)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.85, verbose=True)
 
         return [optimizer], [lr_scheduler]
