@@ -171,13 +171,14 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection after: {ejection}')
         ef_label = ejection.type(torch.float32) / 100.
 
-
+        print(f'nlabel: {nlabel}')
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
 
         classes_vec, ef_pred = self(nvideo)
-
+        print(f'classes_vec: {classes_vec}')
+        
         #print(f'ejection: {ejection.data}')
         #print(f'y_hat: {y_hat.data}')
         loss1 = F.cross_entropy(classes_vec.view(-1, 3), nlabel.view(-1))
