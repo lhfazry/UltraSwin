@@ -62,6 +62,7 @@ class EchoNetDataModule(pl.LightningDataModule):
             self.predict_set   = EchoSet(root=self.data_dir,
                                 split="test",
                                 pad=8,
+                                max_data=100,
                                 random_clip=False,
                                 dataset_mode=self.dataset_mode)
 
