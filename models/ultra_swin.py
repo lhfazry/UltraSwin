@@ -172,9 +172,9 @@ class UltraSwin(pl.LightningModule):
         #print(x.shape)
 
         x = self.forward_features(x) # n c
-        classes_vec, x = self.forward_head(x) # n 1
+        x = self.forward_head(x) # n 1
 
-        return classes_vec, x
+        return x
 
     def training_step(self, batch, batch_idx):
         filename, nvideo, nlabel, ejection, repeat, fps = batch
@@ -192,6 +192,7 @@ class UltraSwin(pl.LightningModule):
         #classes_vec, ef_pred = self(nvideo)
         #print(f'classes_vec: {classes_vec.shape}')
         ef_pred = self(nvideo)
+        #print(f'ef_pred size: {ef_pred.shape}')
 
         #print(f'ejection: {ejection.data}')
         #print(f'y_hat: {y_hat.data}')
