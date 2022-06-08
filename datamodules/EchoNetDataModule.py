@@ -32,7 +32,7 @@ class EchoNetDataModule(pl.LightningDataModule):
                                 split="train",
                                 pad=8,
                                 augmented=False,
-                                max_data=1000,
+                                #max_data=1000,
                                 random_clip=False,
                                 dataset_mode=self.dataset_mode)
             
@@ -44,9 +44,9 @@ class EchoNetDataModule(pl.LightningDataModule):
 
         if stage == "validate" or stage is None:
             self.val_set   = EchoSet(root=self.data_dir,
-                                split="train",
+                                split="val",
                                 pad=8,
-                                max_data=500,
+                                #max_data=500,
                                 random_clip=False,
                                 dataset_mode=self.dataset_mode)
 
@@ -55,7 +55,7 @@ class EchoNetDataModule(pl.LightningDataModule):
             self.test_set   = EchoSet(root=self.data_dir,
                                 split="test",
                                 pad=8,
-                                max_data=100,
+                                #max_data=100,
                                 random_clip=False,
                                 dataset_mode=self.dataset_mode)
 
@@ -63,7 +63,7 @@ class EchoNetDataModule(pl.LightningDataModule):
             self.predict_set   = EchoSet(root=self.data_dir,
                                 split="test",
                                 pad=8,
-                                max_data=100,
+                                #max_data=100,
                                 random_clip=False,
                                 dataset_mode=self.dataset_mode)
 
