@@ -158,7 +158,7 @@ class UltraSwin(pl.LightningModule):
     def forward_head(self, x):
         # input ==> n c d h w
         x = rearrange(x, 'n c d h w -> n d c h w')
-        x = x.mean((3, 4)) # n d c
+        x = x.flatten(-2).mean(3) # n d c
         #x = self.avg_pool(x) # n c 1 1 1
         #x = self.dropout(x)
         #x = x.view(x.shape[0], -1) # n d
@@ -192,6 +192,7 @@ class UltraSwin(pl.LightningModule):
         #print(x.shape)
 
         x = self.forward_features(x) # n c
+        #print(x)
         x = self.forward_head(x) # n 1
 
         return x

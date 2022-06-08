@@ -71,7 +71,7 @@ if __name__ == '__main__':
                 auto_scale_batch_size=True, 
                 enable_model_summary=True,
                 logger=logger,
-                precision=16,
+                #precision=16,
                 accumulate_grad_batches=2,
                 callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=10)])
 
