@@ -254,10 +254,10 @@ class UltraSwin(pl.LightningModule):
         self.val_r2(ef_pred, ef_label)
         #r2loss = r2_score(y_hat, ejection)
 
-        self.log('val_loss', loss, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('val_rmse', self.val_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('val_mae', self.val_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('val_loss', loss, on_step=True, on_epoch=True, batch_size=self.batch_size, prog_bar=True)
+        self.log('val_rmse', self.val_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size, prog_bar=True)
+        self.log('val_mae', self.val_mae, on_step=True, on_epoch=True, batch_size=self.batch_size, prog_bar=True)
+        self.log('val_r2', self.val_r2, on_step=True, on_epoch=True, batch_size=self.batch_size, prog_bar=True)
 
         #tensorboard_logs = {'loss':{'val': loss.detach() } }
         #return {"val_loss": loss, 'log': tensorboard_logs }
@@ -281,11 +281,11 @@ class UltraSwin(pl.LightningModule):
         self.test_r2(ef_pred, ef_label)
         #r2loss = r2_score(y_hat, ejection)
 
-        self.log('test_loss', loss, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_mse', self.test_mse, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
-        self.log('test_r2', self.test_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_loss', loss, on_epoch=True, batch_size=self.batch_size, prog_bar=True)
+        self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size, prog_bar=True)
+        self.log('test_mse', self.test_mse, on_step=True, on_epoch=True, batch_size=self.batch_size, prog_bar=True)
+        self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size, prog_bar=True)
+        self.log('test_r2', self.test_r2, on_step=True, on_epoch=True, batch_size=self.batch_size, prog_bar=True)
 
         return {"test_loss": loss}
 
