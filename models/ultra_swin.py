@@ -50,6 +50,7 @@ class UltraSwin(pl.LightningModule):
         self.val_r2 = torchmetrics.R2Score()
 
         self.test_rmse = torchmetrics.MeanSquaredError(squared=False)
+        self.test_mse = torchmetrics.MeanSquaredError()
         self.test_mae = torchmetrics.MeanAbsoluteError()
         self.test_r2 = torchmetrics.R2Score()
 
@@ -255,12 +256,14 @@ class UltraSwin(pl.LightningModule):
         loss = F.mse_loss(ef_pred, ef_label)
         
         self.test_rmse(ef_pred, ef_label)
+        self.test_mse(ef_pred, ef_label)
         self.test_mae(ef_pred, ef_label)
         self.test_r2(ef_pred, ef_label)
         #r2loss = r2_score(y_hat, ejection)
 
         self.log('test_loss', loss)
         self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
+        self.log('test_mse', self.test_mse, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('test_r2', self.test_r2, on_step=True, on_epoch=True, batch_size=self.batch_size)
 
