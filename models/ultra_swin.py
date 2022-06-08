@@ -137,16 +137,29 @@ class UltraSwin(pl.LightningModule):
 
     def forward_head(self, x):
         # input ==> n c d h w
+        x = rearrange(x, 'n c d h w -> n d c h w')
+        x = x.mean((3, 4)) # n d c
+        #x = self.avg_pool(x) # n c 1 1 1
+        #x = self.dropout(x)
+        #x = x.view(x.shape[0], -1) # n c
+
+        #class_vec = self.extremas(x) # n d 1
+        
+        ef = self.ejection(x) # n 1
+
+        return ef 
+
+    def forward_head_old(self, x):
+        # input ==> n c d h w
         #x = rearrange(x, 'n c d h w -> n c d h w')
 
         x = self.avg_pool(x) # n c 1 1 1
         #x = self.dropout(x)
         x = x.view(x.shape[0], -1) # n c
 
-        classes_vec = self.extremas(x)
         x = self.ejection(x)
 
-        return classes_vec, x # n c
+        return x # n c
 
     def forward(self, x):
         #x1, x2, x3, x4 = self.forward_features(x) # n c d h w
@@ -171,21 +184,23 @@ class UltraSwin(pl.LightningModule):
         #print(f'ejection after: {ejection}')
         ef_label = ejection.type(torch.float32) / 100.
 
-        print(f'nlabel: {nlabel.shape}')
+        #print(f'nlabel: {nlabel.shape}')
         #print(f'nvideo.shape: {nvideo.shape}')
         #print(f'ejection: {ejection}')
         #print(f'nvideo.shape: f{nvideo.shape}')
 
-        classes_vec, ef_pred = self(nvideo)
-        print(f'classes_vec: {classes_vec.shape}')
+        #classes_vec, ef_pred = self(nvideo)
+        #print(f'classes_vec: {classes_vec.shape}')
+        ef_pred = self(nvideo)
 
         #print(f'ejection: {ejection.data}')
         #print(f'y_hat: {y_hat.data}')
-        loss1 = F.cross_entropy(classes_vec.view(-1, 3), nlabel.view(-1))
-        loss2 = F.mse_loss(ef_pred, ef_label)
+        #loss1 = F.cross_entropy(classes_vec.view(-1, 3), nlabel.view(-1))
+        #loss2 = F.mse_loss(ef_pred, ef_label)
 
-        loss = loss1 + loss2
+        #loss = loss1 + loss2
         #loss = F.huber_loss(y_hat, ejection)
+        loss = F.huber_loss(ef_pred, ef_label)
         
         #self.train_mse(y_hat, ejection)
         #self.train_mae(y_hat, ejection)
@@ -209,8 +224,8 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
         ef_label = ejection.type(torch.float32) / 100.
 
-        classes_vec, ef_pred = self(nvideo)
-        loss = F.mse_loss(ef_pred, ef_label)
+        ef_pred = self(nvideo)
+        loss = F.huber_loss(ef_pred, ef_label)
 
         self.val_rmse(ef_pred, ef_label)
         self.val_mae(ef_pred, ef_label)
@@ -235,8 +250,8 @@ class UltraSwin(pl.LightningModule):
         #print(f'nvideo.shape: f{nvideo.shape}')
         ef_label = ejection.type(torch.float32) / 100.
 
-        classes_vec, ef_pred = self(nvideo) 
-        loss = F.mse_loss(ef_pred, ef_label)
+        ef_pred = self(nvideo) 
+        loss = F.huber_loss(ef_pred, ef_label)
         
         self.test_rmse(ef_pred, ef_label)
         self.test_mae(ef_pred, ef_label)
