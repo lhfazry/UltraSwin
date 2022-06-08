@@ -22,7 +22,7 @@ class EchoSet(torch.utils.data.Dataset):
                  random_clip=False,
                  dataset_mode='repeat',
                  SDmode = 'reg', # reg, cla,
-                 num_data = None):
+                 max_data = -1):
 
         self.folder       = pathlib.Path(root)
         self.split        = split
@@ -35,7 +35,7 @@ class EchoSet(torch.utils.data.Dataset):
         self.random_clip  = random_clip
         self.attenuation  = 3 # Exponent to smooth the labels, choose odd numbers, not too big
         self.SDmode       = SDmode #reg, cla
-        self.num_data = num_data
+        self.max_data = max_data
 
         self.fnames       = []
         self.outcome      = []
@@ -75,8 +75,8 @@ class EchoSet(torch.utils.data.Dataset):
                 
                 total += 1
 
-                #if total >= self.num_data and self.num_data is not None:
-                #    break
+                if self.max_data > -1 and total >= self.max_data:
+                    break
                     
 
         self.frames = collections.defaultdict(list)

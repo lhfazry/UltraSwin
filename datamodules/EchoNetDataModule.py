@@ -53,6 +53,7 @@ class EchoNetDataModule(pl.LightningDataModule):
             self.test_set   = EchoSet(root=self.data_dir,
                                 split="train",
                                 pad=8,
+                                max_data=1000,
                                 random_clip=False,
                                 dataset_mode=self.dataset_mode)
 
