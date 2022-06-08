@@ -201,7 +201,7 @@ class UltraSwin(pl.LightningModule):
 
         #loss = loss1 + loss2
         #loss = F.huber_loss(y_hat, ejection)
-        loss = F.huber_loss(ef_pred, ef_label)
+        loss = F.mse_loss(ef_pred, ef_label)
         
         #self.train_mse(y_hat, ejection)
         #self.train_mae(y_hat, ejection)
@@ -226,7 +226,7 @@ class UltraSwin(pl.LightningModule):
         ef_label = ejection.type(torch.float32) / 100.
 
         ef_pred = self(nvideo)
-        loss = F.huber_loss(ef_pred, ef_label)
+        loss = F.mse_loss(ef_pred, ef_label)
 
         self.val_rmse(ef_pred, ef_label)
         self.val_mae(ef_pred, ef_label)
@@ -252,7 +252,7 @@ class UltraSwin(pl.LightningModule):
         ef_label = ejection.type(torch.float32) / 100.
 
         ef_pred = self(nvideo) 
-        loss = F.huber_loss(ef_pred, ef_label)
+        loss = F.mse_loss(ef_pred, ef_label)
         
         self.test_rmse(ef_pred, ef_label)
         self.test_mae(ef_pred, ef_label)
