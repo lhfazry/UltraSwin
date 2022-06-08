@@ -261,7 +261,7 @@ class UltraSwin(pl.LightningModule):
         self.test_r2(ef_pred, ef_label)
         #r2loss = r2_score(y_hat, ejection)
 
-        self.log('test_loss', loss)
+        self.log('test_loss', loss, on_epoch=True, batch_size=self.batch_size)
         self.log('test_rmse', self.test_rmse, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('test_mse', self.test_mse, on_step=True, on_epoch=True, batch_size=self.batch_size)
         self.log('test_mae', self.test_mae, on_step=True, on_epoch=True, batch_size=self.batch_size)
