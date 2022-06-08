@@ -296,7 +296,7 @@ class UltraSwin(pl.LightningModule):
 
         ef_pred = self(nvideo) 
 
-        loss = F.huber_loss(ef_pred, ejection)
+        loss = F.mse_loss(ef_pred, ejection)
         return {'filename': filename, 'EF': ef_label * 100., 'Pred': ef_pred * 100., 'loss': loss * 100.}
 
     def configure_optimizers(self):
