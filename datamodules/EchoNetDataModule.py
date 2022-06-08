@@ -32,7 +32,7 @@ class EchoNetDataModule(pl.LightningDataModule):
                                 split="train",
                                 pad=8,
                                 augmented=False,
-                                max_data=3000,
+                                max_data=1000,
                                 random_clip=False,
                                 dataset_mode=self.dataset_mode)
             
