@@ -242,7 +242,7 @@ class UltraSwin(pl.LightningModule):
         ef_pred = self(nvideo) 
 
         loss = F.huber_loss(ef_pred, ejection)
-        return f"filename: {filename}, EF: {ef_label * 100.}, Pred: {ef_pred * 100.}, loss: {loss * 100.}\n"
+        return {'filename': filename, 'EF': ef_label * 100., 'Pred': ef_pred * 100., 'loss': loss * 100.}
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=1e-3, weight_decay=1e-4)

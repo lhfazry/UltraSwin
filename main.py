@@ -95,4 +95,7 @@ if __name__ == '__main__':
             trainer.logger = False
 
         predicts = trainer.predict(model=ultra_swin, datamodule=data_module, ckpt_path=ckpt_path)
-        print(predicts)
+
+        for predict in predicts:
+            print(predict)
+            print('\n')
