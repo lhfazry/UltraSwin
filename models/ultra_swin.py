@@ -86,17 +86,17 @@ class UltraSwin(pl.LightningModule):
         )
         
         self.ejection = nn.Sequential(
-            nn.LayerNorm(128),
-            nn.Linear(in_features=128, out_features=64, bias=True),
+            nn.LayerNorm(8*embed_dim),
+            nn.Linear(in_features=8*embed_dim, out_features=4*embed_dim, bias=True),
             nn.LeakyReLU(negative_slope=0.05, inplace=True),
 
-            nn.LayerNorm(64),
-            nn.Linear(in_features=64, out_features=32, bias=True),
+            nn.LayerNorm(4*embed_dim),
+            nn.Linear(in_features=4*embed_dim, out_features=2*embed_dim, bias=True),
             nn.LeakyReLU(negative_slope=0.05, inplace=True),
 
-            nn.LayerNorm(32),
+            nn.LayerNorm(2*embed_dim),
             #nn.LeakyReLU(negative_slope=0.05, inplace=True),
-            nn.Linear(in_features=32, out_features=1, bias=True),
+            nn.Linear(in_features=2*embed_dim, out_features=1, bias=True),
 
             Reduce(),
             nn.Sigmoid()
@@ -138,7 +138,7 @@ class UltraSwin(pl.LightningModule):
         '''
 
         #self.dropout = nn.Dropout(p=0.5)
-        self.avg_pool = nn.AdaptiveMaxPool3d((1, 1, 1)) # output size ==> d' x h' x w'
+        self.avg_pool = nn.AdaptiveAvgPool3d((1, 1, 1)) # output size ==> d' x h' x w'
         #self.ef_regressor = nn.Linear(in_features=8*embed_dim, out_features=1, bias=True)
         self.reduce = Reduce()
 
@@ -161,8 +161,8 @@ class UltraSwin(pl.LightningModule):
         x = x.mean((3, 4)) # n d c
         #x = self.avg_pool(x) # n c 1 1 1
         #x = self.dropout(x)
-        #x = x.view(x.shape[0], -1) # n c
-
+        #x = x.view(x.shape[0], -1) # n d
+        #print(x.shape)
         #class_vec = self.extremas(x) # n d 1
         
         ef = self.ejection(x) # n 1
