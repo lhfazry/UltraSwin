@@ -120,9 +120,9 @@ class EchoSet(torch.utils.data.Dataset):
 
         self.vid_augs = va.Sequential([
             #va.RandomCrop(size=(240, 180)), # randomly crop video with a size of (240 x 180)
-            va.RandomRotate(degrees=10), # randomly rotates the video with a degree randomly choosen from [-10, 10]  
-            va.HorizontalFlip(), # horizontally flip the video with 50% probability
-            va.VerticalFlip(),
+            #va.RandomRotate(degrees=10), # randomly rotates the video with a degree randomly choosen from [-10, 10]  
+            #va.HorizontalFlip(), # horizontally flip the video with 50% probability
+            #va.VerticalFlip(),
             va.GaussianBlur(random.random())
         ])
             
@@ -136,6 +136,9 @@ class EchoSet(torch.utils.data.Dataset):
 
             video = np.moveaxis(video, 0, 1)
             
+            # Scale pixel values from 0-255 to 0-1
+            video /= 255.0
+
             samp_size = abs(self.frames[key][0]-self.frames[key][-1])
             if samp_size > self.fixed_length//2:
                 video = video[::2,:,:,:]
@@ -201,9 +204,6 @@ class EchoSet(torch.utils.data.Dataset):
                 vid = nvideo.transpose((0, 2, 3, 1)) # (F, H, W, C) 
                 vid = np.asarray(self.vid_augs(vid)) # (F, H, W, C)
                 nvideo = vid.transpose((0, 3, 1, 2)) # (F, C, H, W)
-
-            # Scale pixel values from 0-255 to 0-1
-            nvideo /= 255.0
             
             #saved_video = nvideo.transpose((0, 2, 3, 1))
             #print(f'after video size: {saved_video.shape}: {filename}')
